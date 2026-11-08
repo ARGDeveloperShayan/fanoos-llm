@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #e0e5ec;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .neumorphic-container {
+            width: 100%;
+            max-width: 900px;
+            height: 90vh;
+            border-radius: 40px;
+            background: #e0e5ec;
+            box-shadow: 
+                20px 20px 60px #bec3c9,
+                -20px -20px 60px #ffffff;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #e0e5ec;
+            border: none;
+            box-shadow: 
+                5px 5px 10px #bec3c9,
+                -5px -5px 10px #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 18px;
+        }
+
+        .control-btn:hover {
+            box-shadow: 
+                inset 5px 5px 10px #bec3c9,
+                inset -5px -5px 10px #ffffff;
+        }
+
+        .chat-window {
+            flex: 1;
+            background: #e0e5ec;
+            border-radius: 30px;
+            padding: 30px;
+            margin-bottom: 30px;
+            overflow-y: auto;
+            box-shadow: 
+                inset 10px 10px 20px #bec3c9,
+                inset -10px -10px 20px #ffffff;
+        }
+
+        .message-bubble {
+            margin-bottom: 20px;
+            position: relative;
+            max-width: 70%;
+        }
+
+        .message-bubble.user {
+            margin-left: auto;
+        }
+
+        .bubble-content {
+            padding: 20px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .message-bubble.user .bubble-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 5px 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .message-bubble.assistant .bubble-content {
+            background: #e0e5ec;
+            color: #333;
+            box-shadow: 
+                5px 5px 15px #bec3c9,
+                -5px -5px 15px #ffffff;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .message-bubble.user .message-time {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .input-area {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .neumorphic-input {
+            width: 100%;
+            padding: 20px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 30px;
+            background: #e0e5ec;
+            box-shadow: 
+                inset 5px 5px 10px #bec3c9,
+                inset -5px -5px 10px #ffffff;
+            color: #333;
+            outline: none;
+        }
+
+        .neumorphic-input:focus {
+            box-shadow: 
+                inset 8px 8px 16px #bec3c9,
+                inset -8px -8px 16px #ffffff;
+        }
+
+        .send-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            box-shadow: 
+                5px 5px 15px rgba(102, 126, 234, 0.3),
+                -5px -5px 15px rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                8px 8px 20px rgba(102, 126, 234, 0.4),
+                -8px -8px 20px rgba(255, 255, 255, 0.9);
+        }
+
+        .send-button:active {
+            transform: translateY(0);
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 25px;
+            background: #e0e5ec;
+            border-radius: 25px;
+            box-shadow: 
+                5px 5px 15px #bec3c9,
+                -5px -5px 15px #ffffff;
+            width: fit-content;
+            margin-bottom: 20px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Custom scrollbar */
+        .chat-window::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-window::-webkit-scrollbar-track {
+            background: #e0e5ec;
+            border-radius: 4px;
+        }
+
+        .chat-window::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+        }
+
+        .chat-window::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #5a6fd9 0%, #6a4190 100%);
+        }
+
+        .model-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px 25px;
+            background: #e0e5ec;
+            border-radius: 25px;
+            box-shadow: 
+                5px 5px 15px #bec3c9,
+                -5px -5px 15px #ffffff;
+        }
+
+        .status-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4CAF50;
+            box-shadow: 0 0 10px #4CAF50;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="neumorphic-container">
+        <div class="header">
+            <h1 class="title">Retro AI</h1>
+            <div class="controls">
+                <button class="control-btn">⚙️</button>
+                <button class="control-btn">📊</button>
+                <button class="control-btn">🎨</button>
+            </div>
+        </div>
+
+        <div class="model-status">
+            <div class="status-light"></div>
+            <span>Model: Retro-AI v3.2 | Status: Active</span>
+        </div>
+
+        <div class="chat-window" id="chatWindow">
+            <div class="message-bubble assistant">
+                <div class="bubble-content">
+                    Hello! I'm Retro AI, designed with neumorphic aesthetics. 
+                    Feel the depth and texture of this interface as we chat!
+                </div>
+                <div class="message-time">2:30 PM</div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    class="neumorphic-input" 
+                    id="userInput" 
+                    placeholder="Type your message..."
+                    onkeypress="handleKeyPress(event)"
+                >
+            </div>
+            <button class="send-button" onclick="sendMessage()">
+                <span style="color: white; font-size: 24px;">→</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const chatWindow = document.getElementById('chatWindow');
+        const userInput = document.getElementById('userInput');
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function showTyping() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <span>Retro AI is thinking...</span>
+            `;
+            chatWindow.appendChild(typingDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            return typingDiv;
+        }
+
+        function addMessage(text, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message-bubble ${isUser ? 'user' : 'assistant'}`;
+            
+            const bubbleContent = document.createElement('div');
+            bubbleContent.className = 'bubble-content';
+            bubbleContent.textContent = text;
+            
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            messageDiv.appendChild(bubbleContent);
+            messageDiv.appendChild(timeDiv);
+            chatWindow.appendChild(messageDiv);
+            
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            userInput.value = '';
+        }
+
+        async function sendMessage() {
+            const prompt = userInput.value.trim();
+            if (!prompt) return;
+
+            addMessage(prompt, true);
+            const typingIndicator = showTyping();
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+
+                const data = await response.json();
+                
+                if (typingIndicator.parentNode) {
+                    chatWindow.removeChild(typingIndicator);
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to generate response');
+                }
+
+                addMessage(data.response || '(no response)', false);
+
+            } catch (error) {
+                if (typingIndicator.parentNode) {
+                    chatWindow.removeChild(typingIndicator);
+                }
+                addMessage(`Error: ${error.message}`, false);
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

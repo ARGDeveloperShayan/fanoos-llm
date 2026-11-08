@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', 'Segoe UI', sans-serif;
+            background: #000;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(76, 0, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 0, 128, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(0, 200, 255, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -2;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.2; }
+            100% { opacity: 1; }
+        }
+
+        .cosmic-terminal {
+            width: 100%;
+            max-width: 1000px;
+            height: 85vh;
+            background: rgba(10, 10, 30, 0.8);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 100, 255, 0.2);
+            box-shadow: 
+                0 0 50px rgba(76, 0, 255, 0.3),
+                inset 0 0 20px rgba(100, 100, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .cosmic-terminal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #4c00ff, transparent);
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .header {
+            padding: 25px 30px;
+            border-bottom: 1px solid rgba(100, 100, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 20, 0.5);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .pulse {
+            width: 12px;
+            height: 12px;
+            background: #00ffaa;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ffaa;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00ffaa, #4c00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 14px;
+            color: #88f;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .holographic-display {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .console-panel {
+            width: 300px;
+            padding: 25px;
+            border-right: 1px solid rgba(100, 100, 255, 0.2);
+            background: rgba(0, 0, 30, 0.5);
+            overflow-y: auto;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            color: #00ffaa;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .system-log {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #88f;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .log-time {
+            color: #00ffaa;
+        }
+
+        .cosmic-button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: rgba(76, 0, 255, 0.2);
+            border: 1px solid rgba(100, 100, 255, 0.4);
+            color: #88f;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cosmic-button:hover {
+            background: rgba(76, 0, 255, 0.4);
+            border-color: #4c00ff;
+            transform: translateX(5px);
+        }
+
+        .chat-hologram {
+            flex: 1;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .cosmic-message {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .message-beam {
+            position: absolute;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, #4c00ff, transparent);
+            opacity: 0.5;
+        }
+
+        .cosmic-message.user .message-beam {
+            right: 0;
+        }
+
+        .cosmic-message.ai .message-beam {
+            left: 0;
+        }
+
+        .message-content {
+            padding: 20px 25px;
+            margin: 0 15px;
+            background: rgba(20, 20, 60, 0.6);
+            border: 1px solid rgba(100, 100, 255, 0.3);
+            border-radius: 15px;
+            position: relative;
+            backdrop-filter: blur(5px);
+            line-height: 1.6;
+        }
+
+        .cosmic-message.user .message-content {
+            margin-left: 50px;
+            border-top-right-radius: 0;
+            border-left: 2px solid #00ffaa;
+        }
+
+        .cosmic-message.ai .message-content {
+            margin-right: 50px;
+            border-top-left-radius: 0;
+            border-right: 2px solid #4c00ff;
+        }
+
+        .message-sender {
+            font-size: 12px;
+            color: #88f;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sender-icon {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ffaa;
+            box-shadow: 0 0 5px #00ffaa;
+        }
+
+        .cosmic-message.ai .sender-icon {
+            background: #4c00ff;
+            box-shadow: 0 0 5px #4c00ff;
+        }
+
+        .input-portal {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .portal-input {
+            flex: 1;
+            padding: 18px 25px;
+            background: rgba(0, 0, 30, 0.7);
+            border: 1px solid rgba(100, 100, 255, 0.4);
+            border-radius: 25px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .portal-input:focus {
+            border-color: #00ffaa;
+            box-shadow: 0 0 20px rgba(0, 255, 170, 0.3);
+        }
+
+        .portal-send {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(76, 0, 255, 0.8), rgba(0, 0, 30, 0.8));
+            border: 2px solid #4c00ff;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portal-send:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(76, 0, 255, 0.6);
+        }
+
+        .portal-send::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, #4c00ff, transparent 30%);
+            animation: rotate 3s linear infinite;
+        }
+
+        .portal-send span {
+            position: relative;
+            z-index: 1;
+            background: rgba(0, 0, 30, 0.9);
+            width: 90%;
+            height: 90%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .quantum-loader {
+            display: flex;
+            gap: 5px;
+            padding: 15px 25px;
+            background: rgba(20, 20, 60, 0.6);
+            border: 1px solid rgba(100, 100, 255, 0.3);
+            border-radius: 15px;
+            width: fit-content;
+            margin: 20px 15px;
+        }
+
+        .quantum-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ffaa;
+            animation: quantum-bounce 1.4s infinite ease-in-out;
+        }
+
+        .quantum-dot:nth-child(1) { animation-delay: -0.32s; }
+        .quantum-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes quantum-bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Custom scrollbar */
+        .message-container::-webkit-scrollbar,
+        .console-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .message-container::-webkit-scrollbar-track,
+        .console-panel::-webkit-scrollbar-track {
+            background: rgba(0, 0, 30, 0.5);
+        }
+
+        .message-container::-webkit-scrollbar-thumb,
+        .console-panel::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #4c00ff, #00ffaa);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+
+    <div class="cosmic-terminal">
+        <div class="header">
+            <div class="logo">
+                <div class="pulse"></div>
+                <div class="title">COSMIC AI</div>
+            </div>
+            <div class="status">
+                <div class="status-item">
+                    <span>QUANTUM STATE:</span>
+                    <span style="color: #00ffaa;">STABLE</span>
+                </div>
+                <div class="status-item">
+                    <span>NEURAL LOAD:</span>
+                    <span style="color: #00ffaa;">12%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="holographic-display">
+            <div class="console-panel">
+                <div class="panel-title">SYSTEM LOG</div>
+                <div class="system-log">
+                    <div class="log-entry">
+                        <span class="log-time">[14:30:00]</span>
+                        <span>Cosmic AI initialized</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-time">[14:30:05]</span>
+                        <span>Quantum processors online</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-time">[14:30:10]</span>
+                        <span>Holographic interface active</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-time">[14:30:15]</span>
+                        <span>Neural network calibrated</span>
+                    </div>
+                </div>
+
+                <div class="panel-title">QUICK ORBITS</div>
+                <button class="cosmic-button" onclick="sendOrbit('What is quantum computing?')">
+                    Quantum Inquiry
+                </button>
+                <button class="cosmic-button" onclick="sendOrbit('Explain black holes')">
+                    Cosmic Phenomena
+                </button>
+                <button class="cosmic-button" onclick="sendOrbit('What is the future of AI?')">
+                    Future Tech
+                </button>
+                <button class="cosmic-button" onclick="sendOrbit('Tell me about exoplanets')">
+                    Exoplanet Data
+                </button>
+            </div>
+
+            <div class="chat-hologram">
+                <div class="message-container" id="messageContainer">
+                    <div class="cosmic-message ai">
+                        <div class="message-beam"></div>
+                        <div class="message-content">
+                            <div class="message-sender">
+                                <div class="sender-icon"></div>
+                                <span>COSMIC AI</span>
+                            </div>
+                            Greetings, traveler. I am Cosmic AI, your guide through the quantum realm of knowledge. 
+                            What cosmic mysteries shall we explore today?
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-portal">
+                    <input 
+                        type="text" 
+                        class="portal-input" 
+                        id="userInput" 
+                        placeholder="Transmit your cosmic inquiry..."
+                        onkeypress="handleQuantumKeyPress(event)"
+                    >
+                    <button class="portal-send" onclick="transmitMessage()">
+                        <span>→</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create stars
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 150; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = star.style.height = Math.random() * 3 + 'px';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.setProperty('--duration', Math.random() * 3 + 2 + 's');
+            starsContainer.appendChild(star);
+        }
+
+        const messageContainer = document.getElementById('messageContainer');
+        const userInput = document.getElementById('userInput');
+
+        function handleQuantumKeyPress(e) {
+            if (e.key === 'Enter') {
+                transmitMessage();
+            }
+        }
+
+        function sendOrbit(text) {
+            userInput.value = text;
+            transmitMessage();
+        }
+
+        function showQuantumLoader() {
+            const loader = document.createElement('div');
+            loader.className = 'quantum-loader';
+            loader.innerHTML = `
+                <div class="quantum-dot"></div>
+                <div class="quantum-dot"></div>
+                <div class="quantum-dot"></div>
+                <span style="margin-left: 10px; color: #88f;">Quantum processing...</span>
+            `;
+            messageContainer.appendChild(loader);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+            return loader;
+        }
+
+        function addMessage(text, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `cosmic-message ${isUser ? 'user' : 'ai'}`;
+            
+            const beam = document.createElement('div');
+            beam.className = 'message-beam';
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            
+            const sender = document.createElement('div');
+            sender.className = 'message-sender';
+            
+            const icon = document.createElement('div');
+            icon.className = 'sender-icon';
+            
+            sender.appendChild(icon);
+            sender.appendChild(document.createTextNode(isUser ? 'YOU' : 'COSMIC AI'));
+            
+            const textNode = document.createElement('div');
+            textNode.textContent = text;
+            textNode.style.marginTop = '8px';
+            
+            content.appendChild(sender);
+            content.appendChild(textNode);
+            
+            messageDiv.appendChild(beam);
+            messageDiv.appendChild(content);
+            messageContainer.appendChild(messageDiv);
+            
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+            userInput.value = '';
+        }
+
+        async function transmitMessage() {
+            const prompt = userInput.value.trim();
+            if (!prompt) return;
+
+            addMessage(prompt, true);
+            const loader = showQuantumLoader();
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+
+                const data = await response.json();
+                
+                messageContainer.removeChild(loader);
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to generate response');
+                }
+
+                addMessage(data.response || '(no response)', false);
+
+            } catch (error) {
+                messageContainer.removeChild(loader);
+                addMessage(`Quantum disruption: ${error.message}`, false);
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

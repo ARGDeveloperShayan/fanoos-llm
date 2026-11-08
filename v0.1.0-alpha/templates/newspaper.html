@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editorial AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background: #f5f1e8;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-image: url('data:image/svg+xml,<svg width="100" height="100" opacity="0.03" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="50%" font-family="Times New Roman" font-size="14" text-anchor="middle" dominant-baseline="middle">AI</text></svg>');
+        }
+
+        .newspaper-container {
+            width: 100%;
+            max-width: 1000px;
+            height: 90vh;
+            background: #fffef7;
+            border-radius: 2px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid #d4c9b8;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .masthead {
+            padding: 20px 40px;
+            border-bottom: 3px double #333;
+            text-align: center;
+            background: #fffef7;
+        }
+
+        .masthead h1 {
+            font-family: 'Georgia', serif;
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: #222;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .masthead-subtitle {
+            font-size: 14px;
+            color: #666;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-top: 1px solid #ccc;
+            padding-top: 8px;
+        }
+
+        .newspaper-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            padding: 30px;
+            border-right: 1px solid #e6dfd0;
+            background: #f9f7f2;
+            overflow-y: auto;
+        }
+
+        .column-title {
+            font-family: 'Georgia', serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #333;
+        }
+
+        .article-item {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: white;
+            border: 1px solid #e6dfd0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .article-item:hover {
+            background: #fffaf0;
+            transform: translateX(5px);
+        }
+
+        .article-title {
+            font-family: 'Georgia', serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 8px;
+        }
+
+        .article-excerpt {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .article-header {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #333;
+        }
+
+        .article-header h2 {
+            font-family: 'Georgia', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .byline {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .article-body {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #222;
+        }
+
+        .article-body p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .pull-quote {
+            font-family: 'Georgia', serif;
+            font-size: 20px;
+            color: #444;
+            padding: 20px;
+            border-left: 4px solid #333;
+            margin: 25px 40px;
+            font-style: italic;
+            background: #f9f7f2;
+        }
+
+        .interactive-section {
+            margin-top: 40px;
+            padding: 30px;
+            background: #f9f7f2;
+            border-top: 2px solid #333;
+        }
+
+        .typewriter-input {
+            width: 100%;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            background: white;
+            border: 1px solid #d4c9b8;
+            resize: none;
+            margin-bottom: 15px;
+            min-height: 100px;
+        }
+
+        .editor-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .editor-btn {
+            padding: 10px 25px;
+            background: #222;
+            color: white;
+            border: none;
+            font-family: 'Georgia', serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .editor-btn:hover {
+            background: #444;
+        }
+
+        .editor-btn.secondary {
+            background: transparent;
+            color: #222;
+            border: 1px solid #222;
+        }
+
+        .editor-btn.secondary:hover {
+            background: #222;
+            color: white;
+        }
+
+        .typewriter-line {
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            height: 2px;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .typewriter-line::before {
+            content: "¶";
+            position: absolute;
+            right: 0;
+            top: -12px;
+            color: #999;
+            font-size: 20px;
+        }
+
+        .chat-message {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border: 1px solid #e6dfd0;
+            position: relative;
+        }
+
+        .chat-message.ai {
+            border-left: 4px solid #333;
+        }
+
+        .chat-message.user {
+            border-right: 4px solid #333;
+            margin-left: 40px;
+        }
+
+        .message-author {
+            font-family: 'Georgia', serif;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .message-author::before {
+            content: "■";
+            color: #333;
+            font-size: 10px;
+        }
+
+        /* Newspaper scrollbar */
+        .main-content::-webkit-scrollbar,
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .main-content::-webkit-scrollbar-track,
+        .sidebar::-webkit-scrollbar-track {
+            background: #f9f7f2;
+        }
+
+        .main-content::-webkit-scrollbar-thumb,
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #8b7d6b;
+        }
+
+        .headline {
+            font-family: 'Georgia', serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #222;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0ede4;
+            border-left: 4px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="newspaper-container">
+        <div class="masthead">
+            <h1>The AI Chronicle</h1>
+            <div class="masthead-subtitle">EST. 2024 | DAILY EDITION | VOL. 1, NO. 1</div>
+        </div>
+
+        <div class="newspaper-body">
+            <div class="sidebar">
+                <div class="column-title">IN TODAY'S EDITION</div>
+                
+                <div class="article-item" onclick="loadArticle('welcome')">
+                    <div class="article-title">Welcome to Editorial AI</div>
+                    <div class="article-excerpt">An introduction to our newspaper-style interface...</div>
+                </div>
+                
+                <div class="article-item" onclick="loadArticle('capabilities')">
+                    <div class="article-title">AI Capabilities</div>
+                    <div class="article-excerpt">What this intelligent assistant can do for you...</div>
+                </div>
+                
+                <div class="article-item" onclick="loadArticle('examples')">
+                    <div class="article-title">Sample Queries</div>
+                    <div class="article-excerpt">Try these interesting conversation starters...</div>
+                </div>
+
+                <div class="typewriter-line"></div>
+
+                <div class="column-title">QUICK ACTIONS</div>
+                
+                <button class="editor-btn secondary" onclick="sendQuickQuery('Explain quantum computing in simple terms')" style="width: 100%; margin-bottom: 10px;">
+                    Ask about Science
+                </button>
+                
+                <button class="editor-btn secondary" onclick="sendQuickQuery('Tell me a fascinating historical fact')" style="width: 100%; margin-bottom: 10px;">
+                    History Inquiry
+                </button>
+                
+                <button class="editor-btn secondary" onclick="sendQuickQuery('Write a short poem about technology')" style="width: 100%;">
+                    Creative Request
+                </button>
+            </div>
+
+            <div class="main-content" id="mainContent">
+                <div class="article-header">
+                    <h2 id="articleTitle">Welcome to Editorial AI</h2>
+                    <div class="byline">BY THE INTELLIGENT ASSISTANT | PUBLISHED TODAY</div>
+                </div>
+
+                <div class="article-body" id="articleBody">
+                    <p>Greetings, esteemed reader. Welcome to <em>The AI Chronicle</em>, where artificial intelligence meets the timeless elegance of newspaper journalism.</p>
+                    
+                    <div class="pull-quote">
+                        "In an age of fleeting digital interactions, we bring back the thoughtful deliberation of the printed word."
+                    </div>
+                    
+                    <p>This interface is designed for meaningful conversation. Each exchange is treated as a proper article, with the care and attention to detail that serious discourse deserves.</p>
+                    
+                    <div class="headline">HOW TO ENGAGE</div>
+                    
+                    <p>Use the typewriter section below to compose your inquiries. The AI will respond in the manner of a seasoned journalist or scholar, depending on the nature of your question.</p>
+                </div>
+
+                <div class="interactive-section">
+                    <div class="headline">COMPOSE YOUR INQUIRY</div>
+                    
+                    <textarea 
+                        class="typewriter-input" 
+                        id="userInput" 
+                        placeholder="Begin typing your question or topic here. Press Ctrl+Enter to send, or use the buttons below..."
+                        rows="4"
+                    ></textarea>
+                    
+                    <div class="editor-buttons">
+                        <button class="editor-btn secondary" onclick="clearInput()">
+                            Clear Draft
+                        </button>
+                        <button class="editor-btn" onclick="sendMessage()">
+                            Publish Inquiry
+                        </button>
+                    </div>
+                </div>
+
+                <div id="chatHistory"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const userInput = document.getElementById('userInput');
+        const chatHistory = document.getElementById('chatHistory');
+        const articleTitle = document.getElementById('articleTitle');
+        const articleBody = document.getElementById('articleBody');
+
+        userInput.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function sendQuickQuery(text) {
+            userInput.value = text;
+            sendMessage();
+        }
+
+        function clearInput() {
+            userInput.value = '';
+        }
+
+        function loadArticle(type) {
+            if (type === 'welcome') {
+                articleTitle.textContent = 'Welcome to Editorial AI';
+                articleBody.innerHTML = `
+                    <p>Greetings, esteemed reader. Welcome to <em>The AI Chronicle</em>, where artificial intelligence meets the timeless elegance of newspaper journalism.</p>
+                    
+                    <div class="pull-quote">
+                        "In an age of fleeting digital interactions, we bring back the thoughtful deliberation of the printed word."
+                    </div>
+                    
+                    <p>This interface is designed for meaningful conversation. Each exchange is treated as a proper article, with the care and attention to detail that serious discourse deserves.</p>
+                `;
+            } else if (type === 'capabilities') {
+                articleTitle.textContent = 'AI Capabilities';
+                articleBody.innerHTML = `
+                    <p>The intelligent assistant behind this newspaper interface can engage in a wide range of conversations and tasks:</p>
+                    
+                    <div class="headline">KNOWLEDGE AREAS</div>
+                    
+                    <p>• <strong>Academic Discussion</strong>: Philosophy, science, history, literature</p>
+                    <p>• <strong>Creative Writing</strong>: Poetry, storytelling, character development</p>
+                    <p>• <strong>Problem Solving</strong>: Logic puzzles, mathematical reasoning</p>
+                    <p>• <strong>Analysis</strong>: Text interpretation, critical thinking</p>
+                    
+                    <div class="pull-quote">
+                        "True intelligence lies not in knowing all answers, but in asking better questions."
+                    </div>
+                `;
+            }
+        }
+
+        function addMessage(text, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${isUser ? 'user' : 'ai'}`;
+            
+            const authorDiv = document.createElement('div');
+            authorDiv.className = 'message-author';
+            authorDiv.textContent = isUser ? 'READER SUBMISSION' : 'AI CORRESPONDENT';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'article-body';
+            contentDiv.innerHTML = `<p>${text.replace(/\n/g, '</p><p>')}</p>`;
+            
+            const timeDiv = document.createElement('div');
+            timeDiv.style.cssText = 'font-size: 12px; color: #666; margin-top: 10px; text-align: right;';
+            timeDiv.textContent = `Published: ${new Date().toLocaleString()}`;
+            
+            messageDiv.appendChild(authorDiv);
+            messageDiv.appendChild(contentDiv);
+            messageDiv.appendChild(timeDiv);
+            chatHistory.appendChild(messageDiv);
+            
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            userInput.value = '';
+        }
+
+        async function sendMessage() {
+            const prompt = userInput.value.trim();
+            if (!prompt) return;
+
+            addMessage(prompt, true);
+            
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'chat-message ai';
+            typingDiv.innerHTML = `
+                <div class="message-author">AI CORRESPONDENT</div>
+                <div class="article-body">
+                    <p><em>The correspondent is composing a response...</em></p>
+                </div>
+            `;
+            chatHistory.appendChild(typingDiv);
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+
+                const data = await response.json();
+                
+                chatHistory.removeChild(typingDiv);
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to generate response');
+                }
+
+                addMessage(data.response || '(no response)', false);
+
+            } catch (error) {
+                chatHistory.removeChild(typingDiv);
+                addMessage(`Error: ${error.message}`, false);
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

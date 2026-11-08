@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal LLM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff00;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .terminal {
+            width: 100%;
+            max-width: 900px;
+            height: 85vh;
+            background: #000;
+            border-radius: 0;
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            background: #111;
+            padding: 15px;
+            border-bottom: 1px solid #00ff00;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .terminal-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .blink {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+        }
+
+        .close { background: #ff5f57; }
+        .minimize { background: #ffbd2e; }
+        .maximize { background: #28ca42; }
+
+        .terminal-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #000;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .prompt-line {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .prompt-sign {
+            color: #00ff00;
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+
+        .prompt-input {
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+            caret-color: #00ff00;
+        }
+
+        .command-output {
+            margin: 10px 0 20px 20px;
+            color: #00ff00;
+            white-space: pre-wrap;
+            border-left: 2px solid #00ff00;
+            padding-left: 15px;
+        }
+
+        .system-output {
+            color: #888;
+            font-style: italic;
+            margin: 10px 0;
+        }
+
+        .terminal-footer {
+            padding: 15px;
+            background: #111;
+            border-top: 1px solid #00ff00;
+            display: flex;
+            gap: 10px;
+        }
+
+        .status-bar {
+            flex: 1;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .quick-commands {
+            display: flex;
+            gap: 10px;
+        }
+
+        .quick-cmd {
+            background: #222;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 5px 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-cmd:hover {
+            background: #00ff00;
+            color: #000;
+        }
+
+        /* Terminal scrollbar */
+        .terminal-body::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .terminal-body::-webkit-scrollbar-track {
+            background: #111;
+        }
+
+        .terminal-body::-webkit-scrollbar-thumb {
+            background: #00ff00;
+        }
+
+        .terminal-body::-webkit-scrollbar-thumb:hover {
+            background: #00cc00;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: #00ff00;
+            vertical-align: middle;
+            margin-left: 2px;
+            animation: blink 1s infinite;
+        }
+
+        .typing {
+            display: inline-block;
+            overflow: hidden;
+            border-right: 2px solid #00ff00;
+            white-space: nowrap;
+            animation: typing 1s steps(30, end), blink 1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal">
+        <div class="terminal-header">
+            <div class="terminal-title">
+                <span class="blink">▶</span>
+                <span>terminal_llm.exe</span>
+                <span class="blink">_</span>
+            </div>
+            <div class="controls">
+                <button class="control-btn close"></button>
+                <button class="control-btn minimize"></button>
+                <button class="control-btn maximize"></button>
+            </div>
+        </div>
+
+        <div class="terminal-body" id="terminalBody">
+            <div class="system-output">
+                ===========================================<br>
+                TERMINAL LLM v1.0<br>
+                Type 'help' for commands, 'clear' to reset<br>
+                ===========================================<br><br>
+            </div>
+            <div class="prompt-line">
+                <span class="prompt-sign">user@llm:~$</span>
+                <div id="outputArea">
+                    <div class="command-output">
+                        Hello! I'm Terminal LLM. I speak in monospace.
+                    </div>
+                </div>
+            </div>
+            <div class="prompt-line" id="inputLine">
+                <span class="prompt-sign">user@llm:~$</span>
+                <input type="text" class="prompt-input" id="userInput" autocomplete="off" autofocus>
+            </div>
+        </div>
+
+        <div class="terminal-footer">
+            <div class="status-bar">
+                <span>Connected | Ready</span>
+            </div>
+            <div class="quick-commands">
+                <button class="quick-cmd" onclick="sendQuickCommand('help')">help</button>
+                <button class="quick-cmd" onclick="sendQuickCommand('clear')">clear</button>
+                <button class="quick-cmd" onclick="sendQuickCommand('status')">status</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const terminalBody = document.getElementById('terminalBody');
+        const userInput = document.getElementById('userInput');
+        const outputArea = document.getElementById('outputArea');
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const command = userInput.value.trim();
+                if (command) {
+                    processCommand(command);
+                }
+                userInput.value = '';
+            }
+        });
+
+        function sendQuickCommand(cmd) {
+            userInput.value = cmd;
+            processCommand(cmd);
+            userInput.value = '';
+        }
+
+        async function processCommand(command) {
+            // Add command to output
+            const commandLine = document.createElement('div');
+            commandLine.className = 'prompt-line';
+            commandLine.innerHTML = `<span class="prompt-sign">user@llm:~$</span> ${command}`;
+            outputArea.appendChild(commandLine);
+
+            // Show typing indicator
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'prompt-line';
+            typingIndicator.innerHTML = `<span class="prompt-sign">llm:</span> <span class="typing">processing</span>`;
+            outputArea.appendChild(typingIndicator);
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: command })
+                });
+
+                const data = await response.json();
+                
+                // Remove typing indicator
+                outputArea.removeChild(typingIndicator);
+
+                // Add response
+                const responseLine = document.createElement('div');
+                responseLine.className = 'command-output';
+                responseLine.textContent = data.response || 'No response generated';
+                outputArea.appendChild(responseLine);
+
+            } catch (error) {
+                outputArea.removeChild(typingIndicator);
+                const errorLine = document.createElement('div');
+                errorLine.className = 'command-output';
+                errorLine.style.color = '#ff0000';
+                errorLine.textContent = `Error: ${error.message}`;
+                outputArea.appendChild(errorLine);
+            }
+
+            // Add new prompt
+            const newPrompt = document.createElement('div');
+            newPrompt.className = 'prompt-line';
+            newPrompt.innerHTML = `<span class="prompt-sign">user@llm:~$</span> `;
+            outputArea.appendChild(newPrompt);
+
+            // Scroll to bottom
+            terminalBody.scrollTop = terminalBody.scrollHeight;
+        }
+    </script>
+</body>
+</html>
