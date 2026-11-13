@@ -1,5 +1,5 @@
 """
-Flask web application for TinyLLM.
+Flask web application for FanoosLLM.
 Provides a simple web interface for interacting with the model.
 """
 
@@ -7,7 +7,7 @@ from flask import Flask, render_template, request, jsonify
 import torch
 import config
 from vocab import Vocabulary
-from model import TinyLLMModel
+from model import FanoosLLMModel
 from generate import generate_response
 import os
 
@@ -32,7 +32,7 @@ def load_model():
     config.VOCAB_SIZE = vocab.size
     
     # Initialize model
-    model = TinyLLMModel(vocab_size=vocab.size)
+    model = FanoosLLMModel(vocab_size=vocab.size)
     
     # Load trained weights if available
     if os.path.exists(config.MODEL_SAVE_PATH):
@@ -81,7 +81,7 @@ def generate():
 
 
 if __name__ == '__main__':
-    print("Loading TinyLLM model...")
+    print("Loading FanoosLLM model...")
     load_model()
     print("Model loaded! Starting web server...")
     print("Open http://localhost:5000 in your browser")

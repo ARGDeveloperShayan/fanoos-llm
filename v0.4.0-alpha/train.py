@@ -11,11 +11,28 @@ torch.backends.cudnn.allow_tf32 = True
 from fanoos import FanoosConfig
 from fanoos import load_tokenizer
 from fanoos import FanoosLLM
+from fanoos import clean_state_dict
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
-def get_batch(data, mask, block_size, batch_size, device):
-    ix = np.random.randint(0, len(data) - block_size - 1, size=batch_size)
+def load_bin(path, dtype, label):
+    if not os.path.isfile(path):
+        raise SystemExit(
+            f"[train] missing {label}: {path}\n"
+            f"        Run prepare_pretrain.py (pretrain) or prepare.py (SFT) first."
+        )
+    if os.path.getsize(path) == 0:
+        raise SystemExit(
+            f"[train] empty {label}: {path}\n"
+            f"        The prepare step produced no data."
+        )
+    return np.memmap(path, dtype=dtype, mode="r")
+
+def get_batch(data, mask, block_size, batch_size, device, aligned=False):
+    if aligned:
+        ix = np.random.randint(0, (len(data) - 1) // block_size, size=batch_size) * block_size
+    else:
+        ix = np.random.randint(0, len(data) - block_size - 1, size=batch_size)
     x_np = data[ix[:, None] + np.arange(block_size)].astype(np.int64)
     y_np = data[ix[:, None] + np.arange(1, block_size + 1)].astype(np.int64)
     m_np = mask[ix[:, None] + np.arange(1, block_size + 1)]
@@ -56,7 +73,8 @@ def build_optimizer(model, cfg):
     except ImportError:
         opt = torch.optim.AdamW(groups, lr=cfg.learning_rate, betas=(0.9, 0.95),
                                 fused=torch.cuda.is_available())
-        print("[train] WARNING: bitsandbytes not installed -> torch.optim.AdamW")
+        print("[train] optimizer: AdamW8bit")
+        print("[train] bitsandbytes not installed. To install, run: pip install bitsandbytes")
     return opt
 
 def export_hf(model, cfg, out_dir):
@@ -94,6 +112,16 @@ def main():
     ap.add_argument("--eval-interval", type=int, default=100)
     ap.add_argument("--eval-iters",    type=int, default=20)
     ap.add_argument("--save-interval", type=int, default=250)
+
+    ap.add_argument("--data-dir", default=None)
+    ap.add_argument("--ckpt-dir", default=None)
+    ap.add_argument("--init-from", default=None)
+    ap.add_argument("--lr", type=float, default=None)
+    ap.add_argument("--min-lr", type=float, default=None)
+    ap.add_argument("--warmup", type=int, default=None)
+    ap.add_argument("--dropout", type=float, default=None)
+    ap.add_argument("--aligned", action="store_true")
+
     args = ap.parse_args()
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -105,6 +133,12 @@ def main():
     if args.micro_batch: cfg.micro_batch_size = args.micro_batch
     if args.grad_accum:  cfg.gradient_accumulation_steps = args.grad_accum
     if args.block_size:  cfg.block_size = args.block_size
+    if args.data_dir:  cfg.data_dir = args.data_dir
+    if args.ckpt_dir:  cfg.checkpoint_dir = args.ckpt_dir
+    if args.lr:        cfg.learning_rate = args.lr
+    if args.min_lr:    cfg.min_learning_rate = args.min_lr
+    if args.warmup:    cfg.warmup_iters = args.warmup
+    if args.dropout is not None: cfg.dropout = args.dropout
 
     tok, special = load_tokenizer()
     cfg.resolve_vocab_size(len(tok))
@@ -112,21 +146,27 @@ def main():
     print(f"[train] tokenizer vocab {len(tok):,} -> model vocab {cfg.vocab_size:,}")
 
     data_dir = os.path.join(PROJECT_ROOT, cfg.data_dir)
-    train_data = np.memmap(os.path.join(data_dir, "train.bin"),      dtype=np.uint32, mode="r")
-    val_data   = np.memmap(os.path.join(data_dir, "val.bin"),        dtype=np.uint32, mode="r")
-    train_mask = np.memmap(os.path.join(data_dir, "train_mask.bin"), dtype=np.uint8,  mode="r")
-    val_mask   = np.memmap(os.path.join(data_dir, "val_mask.bin"),   dtype=np.uint8,  mode="r")
+    train_data = load_bin(os.path.join(data_dir, "train.bin"),      np.uint32, "train.bin")
+    val_data   = load_bin(os.path.join(data_dir, "val.bin"),        np.uint32, "val.bin")
+    train_mask = load_bin(os.path.join(data_dir, "train_mask.bin"), np.uint8,  "train_mask.bin")
+    val_mask   = load_bin(os.path.join(data_dir, "val_mask.bin"),   np.uint8,  "val_mask.bin")
     print(f"[train] train.bin: {len(train_data):,} tokens | val.bin: {len(val_data):,} tokens")
 
     model = FanoosLLM(cfg).to(device)
+    raw_model = model
     print(f"[train] parameters: {model.num_parameters() / 1e6:.2f}M")
+    if args.init_from:
+        sd = clean_state_dict(torch.load(args.init_from, map_location=device, weights_only=False)["model"])
+        res = model.load_state_dict(sd, strict=False)
+        assert not res.unexpected_keys and set(res.missing_keys) <= {"lm_head.weight"}, res
+        print("[train] init from", args.init_from, "OK")
 
     if not args.no_ckpt and model.num_parameters() > 100_000_000:
         model.gradient_checkpointing_enable()
         print("[train] gradient checkpointing: ON (large model)")
     else:
         print("[train] gradient checkpointing: OFF")
-    if args.compile and os.name == "posix":
+    if args.compile:
         model = torch.compile(model)
         print("[train] torch.compile: ON")
 
@@ -140,6 +180,7 @@ def main():
     if args.resume and os.path.isfile(ckpt_path):
         ckpt = torch.load(ckpt_path, map_location=device, weights_only=False)
         model.load_state_dict(ckpt["model"])
+        raw_model.load_state_dict(clean_state_dict(ckpt["model"]))
         optimizer.load_state_dict(ckpt["optimizer"])
         start_iter, best_val = ckpt["iter"] + 1, ckpt.get("best_val", float("inf"))
         print(f"[train] resumed from {ckpt_path} at iter {start_iter}")
@@ -154,7 +195,7 @@ def main():
                                  ("val",   val_data,   val_mask)):
             losses = torch.zeros(n_eval_iters)
             for k in range(n_eval_iters):
-                x, y = get_batch(data, msk, cfg.block_size, cfg.micro_batch_size, device)
+                x, y = get_batch(data, msk, cfg.block_size, cfg.micro_batch_size, device, aligned=args.aligned)
                 with torch.amp.autocast(device_type="cuda", dtype=torch.bfloat16,
                                         enabled=device == "cuda"):
                     _, loss, _ = model(x, y)
@@ -181,7 +222,7 @@ def main():
         optimizer.zero_grad(set_to_none=True)
 
         for micro in range(cfg.gradient_accumulation_steps):
-            x, y = get_batch(train_data, train_mask, cfg.block_size, cfg.micro_batch_size, device)
+            x, y = get_batch(train_data, train_mask, cfg.block_size, cfg.micro_batch_size, device, aligned=args.aligned)
             with torch.amp.autocast(device_type="cuda", dtype=torch.bfloat16,
                                     enabled=device == "cuda"):
                 _, loss, _ = model(x, y)
@@ -210,17 +251,17 @@ def main():
                   f"(ppl {math.exp(min(losses['val'], 20)):.2f})")
             if losses["val"] < best_val:
                 best_val = losses["val"]
-                torch.save({"model": model.state_dict(), "cfg": cfg.to_dict(),
+                torch.save({"model": raw_model.state_dict(), "cfg": cfg.to_dict(),
                             "iter": it, "best_val": best_val},
                            os.path.join(ckpt_dir, "best.pt"))
 
         if (it % args.save_interval == 0 and it > 0) or it == cfg.max_train_iters - 1:
-            torch.save({"model": model.state_dict(), "optimizer": optimizer.state_dict(),
+            torch.save({"model": raw_model.state_dict(), "optimizer": optimizer.state_dict(),
                         "cfg": cfg.to_dict(), "iter": it, "best_val": best_val},
                        ckpt_path)
             print(f"[train] checkpoint saved to {ckpt_path}", flush=True)
 
-    torch.save({"model": model.state_dict(), "cfg": cfg.to_dict(),
+    torch.save({"model": raw_model.state_dict(), "cfg": cfg.to_dict(),
                 "iter": cfg.max_train_iters},
                os.path.join(ckpt_dir, "final.pt"))
     export_hf(model, cfg, os.path.join(PROJECT_ROOT, cfg.export_dir, "fanoos-ai"))

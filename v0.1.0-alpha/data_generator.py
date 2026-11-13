@@ -1,5 +1,5 @@
 """
-Synthetic data generator for TinyLLM.
+Synthetic data generator for FanoosLLM.
 Generates training examples using only the closed vocabulary.
 """
 
@@ -9,7 +9,7 @@ from typing import Tuple, List
 
 class SyntheticDataGenerator:
     """
-    Generates synthetic training data for TinyLLM.
+    Generates synthetic training data for FanoosLLM.
     Creates dialogues, arithmetic problems, and lightweight utility intents.
     """
     
@@ -39,7 +39,7 @@ class SyntheticDataGenerator:
         self.greeting_responses = [
             "hello",
             "hey",
-            "hello i am tinyllm",
+            "hello i am fanoosllm",
             "hello",
             "hey"  # More weight on simple responses
         ]
@@ -53,10 +53,10 @@ class SyntheticDataGenerator:
         ]
         
         self.name_responses = [
-            "i am tinyllm",
-            "my name is tinyllm",
-            "i am a tinyllm",
-            "tinyllm"
+            "i am fanoosllm",
+            "my name is fanoosllm",
+            "i am a fanoosllm",
+            "fanoosllm"
         ]
         
         # Define general Q&A patterns (non-mathematical)
@@ -73,7 +73,7 @@ class SyntheticDataGenerator:
         self.fact_patterns = [
             ("what is python", "python is a programming language"),
             ("what is a transformer", "a transformer is an attention based model"),
-            ("who are you", "i am tinyllm"),
+            ("who are you", "i am fanoosllm"),
             ("what can you do", "i can chat and solve math and tasks"),
             ("who made you", "i am a tiny demo model"),
             ("what is machine learning", "machine learning uses data to learn patterns"),
@@ -111,7 +111,7 @@ class SyntheticDataGenerator:
             ("what is your dream", "my dream is to help people learn"),
             ("are you smart", "i try to be helpful and knowledgeable"),
             ("what is night for", "night is time to sleep"),
-            ("what is your favorite movie", "my favorite movie is tinyllm"),
+            ("what is your favorite movie", "my favorite movie is fanoosllm"),
         ]
         
         # More complex math patterns (larger numbers, multi-step hints)
@@ -132,7 +132,7 @@ class SyntheticDataGenerator:
             ("first line gives the answer", "second line gives a hint"),
             ("summary line one", "details line two"),
             ("hello this is line one", "and this is line two"),
-            ("tinyllm can answer", "and also show two lines"),
+            ("fanoosllm can answer", "and also show two lines"),
         ]
     
     def _safe_sample_number(self, upper: int = None) -> int:
@@ -224,7 +224,7 @@ class SyntheticDataGenerator:
         greeting = random.choice(["hey", "hello"])
         name_query = random.choice(["what is your name", "tell me your name"])
         input_text = f"{greeting} {name_query}"
-        response = "hello i am tinyllm"
+        response = "hello i am fanoosllm"
         return input_text, response
     
     def generate_arithmetic_query_example(self) -> Tuple[str, str]:
@@ -425,11 +425,11 @@ class SyntheticDataGenerator:
         input_text = random.choice(self.greeting_inputs)
         # More consistent: always respond with "hello" or "hey" for greetings
         if input_text == "hey":
-            response = random.choice(["hello", "hey", "hello i am tinyllm"])
+            response = random.choice(["hello", "hey", "hello i am fanoosllm"])
         elif input_text == "hello":
-            response = random.choice(["hello", "hey", "hello i am tinyllm"])
+            response = random.choice(["hello", "hey", "hello i am fanoosllm"])
         else:
-            response = "hello i am tinyllm"
+            response = "hello i am fanoosllm"
         return input_text, response
     
     def generate_example(self) -> Tuple[str, str]:

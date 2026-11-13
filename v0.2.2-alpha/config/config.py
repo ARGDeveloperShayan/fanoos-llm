@@ -1,4 +1,4 @@
-# config/tinyllm.py
+# config/fanoosllm.py
 
 out_dir = 'model'
 eval_interval = 500

@@ -1,13 +1,13 @@
 """
-Main orchestration script for TinyLLM.
+Main orchestration script for FanoosLLM.
 Trains the model and demonstrates text generation.
 """
 
 import torch
 import config
 from vocab import Vocabulary
-from dataset import TinyLLMDataset
-from model import TinyLLMModel
+from dataset import FanoosLLMDataset
+from model import FanoosLLMModel
 from train import train_model
 from generate import generate_response
 
@@ -17,7 +17,7 @@ def main():
     Main function: train model and generate examples.
     """
     print("=" * 60)
-    print("TINYLLM - Minimal From-Scratch Language Model")
+    print("FANOOS LLM - Minimal From-Scratch Language Model")
     print("=" * 60)
     print()
     
@@ -34,11 +34,11 @@ def main():
     # Step 2: Create datasets
     print("Step 2: Generating training data...")
     print(f"  Generating {config.TRAIN_DATA_SIZE} training examples...")
-    train_dataset = TinyLLMDataset(vocab, num_examples=config.TRAIN_DATA_SIZE)
+    train_dataset = FanoosLLMDataset(vocab, num_examples=config.TRAIN_DATA_SIZE)
     print(f"  Training dataset size: {len(train_dataset)}")
     
     print(f"  Generating {config.VAL_DATA_SIZE} validation examples...")
-    val_dataset = TinyLLMDataset(vocab, num_examples=config.VAL_DATA_SIZE)
+    val_dataset = FanoosLLMDataset(vocab, num_examples=config.VAL_DATA_SIZE)
     print(f"  Validation dataset size: {len(val_dataset)}")
     print()
     
@@ -102,7 +102,7 @@ def main():
         print()
     
     print("=" * 60)
-    print("TinyLLM demonstration completed!")
+    print("FanoosLLM demonstration completed!")
     print("=" * 60)
 
 

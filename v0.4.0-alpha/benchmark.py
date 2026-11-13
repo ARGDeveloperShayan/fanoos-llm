@@ -10,7 +10,8 @@ import numpy as np
 import torch
 
 from fanoos import build_prompt, decode_tokens, load_tokenizer
-from fanoos import FanoosConfig, FanoosLLM
+from fanoos import FanoosConfig, FanoosLLM, clean_state_dict
+from fanoos import DEFAULT_SYSTEM_PROMPT
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -35,7 +36,7 @@ FACTUAL_PROMPTS = [
     ("Who wrote Romeo and Juliet?", "shakespeare"),
     ("What color is the sky on a clear day?", "blue"),
     ("What is H2O commonly known as?", "water"),
-    ("How many days are in a week?", "seven"),
+    ("How many days are in a week?", ("seven", "7")),
     ("What planet is known as the Red Planet?", "mars"),
 ]
 
@@ -45,7 +46,7 @@ def load_model(checkpoint: str, device: str):
     cfg_dict["preset"] = None
     cfg = FanoosConfig(**cfg_dict)
     model = FanoosLLM(cfg).to(device)
-    missing, unexpected = model.load_state_dict(ckpt["model"], strict=False)
+    missing, unexpected = model.load_state_dict(clean_state_dict(ckpt["model"]), strict=False)
     assert not unexpected and set(missing) <= {"lm_head.weight"}, (missing, unexpected)
     model.eval()
     return model, cfg, ckpt
@@ -156,7 +157,11 @@ def qualitative(model, tok, special, device, max_new_tokens=150,
     results = []
     for kind, prompts in (("code", CODE_PROMPTS), ("chat", CHAT_PROMPTS)):
         for p in prompts:
-            text = build_prompt([{"role": "user", "content": p}], add_generation_prompt=True)
+            text = build_prompt(
+                [{"role": "user", "content": p}],
+                add_generation_prompt=True,
+                system_prompt=DEFAULT_SYSTEM_PROMPT,
+            )
             ids  = tok.encode(text, add_special_tokens=False)
             x    = torch.tensor([ids], device=device)
             out  = model.generate(x, max_new_tokens=max_new_tokens,
@@ -172,14 +177,14 @@ def qualitative(model, tok, special, device, max_new_tokens=150,
 def factual_accuracy(model, tok, special, device, max_new_tokens=32):
     rows, correct = [], 0
     for q, expected in FACTUAL_PROMPTS:
-        text = build_prompt([{"role": "user", "content": q}], add_generation_prompt=True)
+        text = build_prompt([{"role": "user", "content": q}], add_generation_prompt=True, system_prompt=DEFAULT_SYSTEM_PROMPT)
         ids  = tok.encode(text, add_special_tokens=False)
         x    = torch.tensor([ids], device=device)
         out  = model.generate(x, max_new_tokens=max_new_tokens,
                               temperature=0.0, top_k=1, top_p=1.0,
                               eos_token_id=special["im_end"])
         reply = decode_tokens(tok, out[0, len(ids):].tolist()).lower()
-        hit = expected.lower() in reply
+        hit = any(e in reply for e in (expected if isinstance(expected, tuple) else (expected,)))
         correct += int(hit)
         rows.append({"q": q, "expected": expected, "response": reply, "correct": hit})
     total = len(FACTUAL_PROMPTS)
@@ -251,8 +256,7 @@ def main():
         print("\n[perplexity] skipped (no val.bin)")
 
     if not args.skip_gen:
-        gen = bench_generation_speed(model, device, max_new_tokens=args.max_new_tokens,
-                                     eos_token_id=special["im_end"])
+        gen = bench_generation_speed(model, device, max_new_tokens=args.max_new_tokens)
         print(f"\n[gen speed] {gen['mean_tok_s']:.1f} ± {gen['std_tok_s']:.1f} tok/s "
               f"(min {gen['min_tok_s']:.1f}, max {gen['max_tok_s']:.1f}, n={gen['runs']})")
         results["generation_speed"] = gen

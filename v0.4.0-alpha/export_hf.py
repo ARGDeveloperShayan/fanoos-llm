@@ -4,7 +4,7 @@ import os
 import shutil
 import torch
 from safetensors.torch import save_file
-from fanoos import FanoosConfig, FanoosLLM, load_tokenizer
+from fanoos import FanoosConfig, FanoosLLM, load_tokenizer, clean_state_dict
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -23,7 +23,7 @@ def main():
     cfg.resolve_vocab_size(len(tok))
 
     model = FanoosLLM(cfg).to(device)
-    missing, unexpected = model.load_state_dict(ckpt["model"], strict=False)
+    missing, unexpected = model.load_state_dict(clean_state_dict(ckpt["model"]), strict=False)
     assert not unexpected and set(missing) <= {"lm_head.weight"}, (missing, unexpected)
     model.eval()
 

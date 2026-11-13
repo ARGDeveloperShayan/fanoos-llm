@@ -1,2 +1,10 @@
 __pycache__/
 v0.4.0-alpha/assets/
+datasets.rar
+presentation/
+v0.4.0-alpha/checkpoints_pretrain/
+v0.4.0-alpha/checkpoints_sft/
+v0.4.0-alpha/data_pretrain/
+v0.4.0-alpha/data_sft/
+v0.4.0-alpha/export/
+v0.4.0-alpha/tokenizer/

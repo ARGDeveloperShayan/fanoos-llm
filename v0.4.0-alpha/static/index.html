@@ -139,31 +139,6 @@
             flex-direction: row-reverse;
         }
 
-        .avatar {
-            flex-shrink: 0;
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            display: grid;
-            place-items: center;
-            font-size: 14px;
-            font-weight: 700;
-            border: 1px solid var(--border-2);
-        }
-
-        .avatar.user {
-            background: var(--user);
-            color: #cfe3ff;
-            border-color: var(--user-border);
-        }
-
-        .avatar.assistant {
-            background: linear-gradient(135deg, #2a1e08, #4a330c);
-            color: var(--accent-hi);
-            border-color: #5c4310;
-            box-shadow: 0 0 16px rgba(240, 180, 41, 0.18);
-        }
-
         .bubble {
             padding: 13px 17px;
             border-radius: var(--radius);
@@ -382,27 +357,8 @@
     </style>
 </head>
 <body>
-    <header>
-        <div class="lantern"></div>
-        <div class="brand">
-            <h1>Fanoos AI</h1>
-            <small>a tiny lantern-lit language model</small>
-        </div>
-        <div class="spacer"></div>
-        <button class="icon-btn" id="newChat" title="Start a new chat">New chat</button>
-    </header>
-
     <div id="chat">
-        <div class="hint" id="hint">
-            <h2>Ask Fanoos anything</h2>
-            <p>Code, explanations, brainstorming — a small model doing its best.</p>
-            <div class="suggestions">
-                <button class="suggestion" data-p="Write a Python function that reverses a linked list.">Reverse a linked list</button>
-                <button class="suggestion" data-p="Explain TCP vs UDP like I'm five.">TCP vs UDP, ELI5</button>
-                <button class="suggestion" data-p="Give me a 3-step plan to learn machine learning.">Learn ML in 3 steps</button>
-                <button class="suggestion" data-p="Write a haiku about lanterns.">Haiku about lanterns</button>
-            </div>
-        </div>
+        <!-- messages come here -->
     </div>
 
     <footer>
@@ -414,7 +370,6 @@
                 </svg>
             </button>
         </form>
-        <div class="meta">Fanoos may hallucinate. Verify important info.</div>
     </footer>
 
     <script>
@@ -519,9 +474,6 @@
             if (hint && hint.parentNode) hint.remove();
             const wrap = document.createElement("div");
             wrap.className = "msg-wrap " + role;
-            const av = document.createElement("div");
-            av.className = "avatar " + role;
-            av.textContent = role === "user" ? "U" : "F";
             const bubble = document.createElement("div");
             bubble.className = "bubble";
             if (role === "assistant") {
@@ -529,7 +481,7 @@
             } else {
                 bubble.textContent = content;
             }
-            wrap.append(av, bubble);
+            wrap.appendChild(bubble);
             chat.appendChild(wrap);
             chat.scrollTop = chat.scrollHeight;
             return bubble;

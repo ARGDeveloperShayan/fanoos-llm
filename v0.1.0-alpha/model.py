@@ -1,5 +1,5 @@
 """
-Neural network model for TinyLLM.
+Neural network model for FanoosLLM.
 Implements a minimal Transformer Decoder architecture.
 """
 
@@ -172,16 +172,16 @@ class TransformerBlock(nn.Module):
         return x
 
 
-class TinyLLMModel(nn.Module):
+class FanoosLLMModel(nn.Module):
     """
-    Main TinyLLM model: a minimal Transformer Decoder.
+    Main FanoosLLM model: a minimal Transformer Decoder.
     """
     
     def __init__(self, vocab_size: int, embed_dim: int = None, num_heads: int = None,
                  num_layers: int = None, ff_dim: int = None, dropout: float = None,
                  max_seq_len: int = None):
         """
-        Initialize TinyLLM model.
+        Initialize FanoosLLM model.
         
         Args:
             vocab_size: Size of vocabulary
@@ -286,7 +286,7 @@ if __name__ == '__main__':
     from vocab import Vocabulary
     
     vocab = Vocabulary()
-    model = TinyLLMModel(vocab_size=vocab.size)
+    model = FanoosLLMModel(vocab_size=vocab.size)
     
     # Ensure model is on CPU
     device = torch.device('cpu')

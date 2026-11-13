@@ -7,7 +7,7 @@ from .chat import (
     format_message,
     load_tokenizer,
 )
-from .model import FanoosLLM, KVCache, build_model
+from .model import FanoosLLM, KVCache, build_model, clean_state_dict
 
 __all__ = [
     "FanoosConfig", "PRESETS", "FanoosLLM", "KVCache", "build_model",

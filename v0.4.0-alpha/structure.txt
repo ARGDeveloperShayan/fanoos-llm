@@ -1,0 +1,461 @@
+Folder structure for: D:/Shayan Nateghi/Projects/TinyLLM
+============================================================
+
+├── .git
+│   ├── COMMIT_EDITMSG
+│   ├── FETCH_HEAD
+│   ├── HEAD
+│   ├── config
+│   ├── description
+│   ├── hooks
+│   │   ├── applypatch-msg.sample
+│   │   ├── commit-msg.sample
+│   │   ├── fsmonitor-watchman.sample
+│   │   ├── post-update.sample
+│   │   ├── pre-applypatch.sample
+│   │   ├── pre-commit.sample
+│   │   ├── pre-merge-commit.sample
+│   │   ├── pre-push.sample
+│   │   ├── pre-rebase.sample
+│   │   ├── pre-receive.sample
+│   │   ├── prepare-commit-msg.sample
+│   │   ├── push-to-checkout.sample
+│   │   ├── sendemail-validate.sample
+│   │   └── update.sample
+│   ├── index
+│   ├── info
+│   │   └── exclude
+│   ├── logs
+│   │   ├── HEAD
+│   │   └── refs
+│   │       ├── heads
+│   │       │   └── main
+│   │       └── remotes
+│   │           └── origin
+│   │               ├── HEAD
+│   │               └── main
+│   ├── objects
+│   │   ├── 04
+│   │   │   └── 469ae92eca87a854f05b7991c414b374d4a587
+│   │   ├── 05
+│   │   │   └── 09e969d490dac00441c7d768b5cb509853e067
+│   │   ├── 09
+│   │   │   └── d574a5b8e6360af60ac17449ba8f01c1abf5e1
+│   │   ├── 0c
+│   │   │   └── f28aeee6d94e199212d4d1301948574f82361b
+│   │   ├── 0d
+│   │   │   └── 0de27760d809f79fc465a060b27bbef82c28bb
+│   │   ├── 0f
+│   │   │   └── 53502376a846df509dc85dfada1d68af9e6963
+│   │   ├── 12
+│   │   │   ├── c584875bd6b302b40f965240308ff6a25af16f
+│   │   │   ├── d062454facf1da4f0a69713fa5639e59761208
+│   │   │   └── f56508a89dea273aa1e04aab95747308ac278a
+│   │   ├── 13
+│   │   │   ├── 6a24203c7763c786bd8e40b697e4124c2932b8
+│   │   │   └── b8283538591152ccb949fe37fb0608f8b7787c
+│   │   ├── 16
+│   │   │   ├── c68a9135f4c422fc4c95af475da5f298f509ca
+│   │   │   └── f42a4886465cf3e13b05977f5867194ff894c4
+│   │   ├── 17
+│   │   │   └── 071c33b07d8a28beec6f6d42f97431d792b3a3
+│   │   ├── 1f
+│   │   │   └── 1d9aaca301414e7f6c9396df506798ff4eb9a6
+│   │   ├── 20
+│   │   │   └── 5052c04a5bf1e71e3f5c685167a2946c2ebafe
+│   │   ├── 22
+│   │   │   └── 6b0752cac7789c48f0cb3ec53eda48b7be36cc
+│   │   ├── 23
+│   │   │   ├── 3e1ab0bbb60005e1b6b8dfcef1d87a9b6c4791
+│   │   │   └── 9162a1d2da48e5a6d5712043b098cd883632fd
+│   │   ├── 30
+│   │   │   └── 4be5b93e881f4a54d5ade0661137680d600f3d
+│   │   ├── 33
+│   │   │   ├── 1008523a04541c2b6158c655baa17085c2720f
+│   │   │   ├── 754c04fe955a83316008c9e2def17ddc7e4046
+│   │   │   └── ebce097da4039b8809c90b3aa44b6f4a5f83d1
+│   │   ├── 36
+│   │   │   └── 6a21df2b9631639e51b311c0a25cc9cdc7ddd1
+│   │   ├── 37
+│   │   │   └── 6804179a4a0ac8fb44702c022f1ef19ea37f99
+│   │   ├── 38
+│   │   │   └── 149e769b2d717bfd7621a12ff5110b68904470
+│   │   ├── 3a
+│   │   │   └── 434985531cd6a523644a8c0af8043fd94e2023
+│   │   ├── 3b
+│   │   │   └── cd1e0c4c67185bac44a25c7d01429fadb984f2
+│   │   ├── 3e
+│   │   │   ├── 583907088b5e6a6e8a6df079b718b7829fde9d
+│   │   │   ├── 6d7eae10dd23812120594aacd74616e024ea11
+│   │   │   └── a8f89ac0f8fe5dbe884ff7a3e4eb2d29c4470f
+│   │   ├── 43
+│   │   │   └── e7f3c73dce24296173221796d22be77d98d647
+│   │   ├── 46
+│   │   │   ├── 20ff86c529d7976dcd8244ebd61cd89d850241
+│   │   │   └── c3034f3aea41678effae5070ea7e571b2aa0cf
+│   │   ├── 47
+│   │   │   └── d8204e8b50fd86ee3a3ae5a7526d90d0a67c29
+│   │   ├── 48
+│   │   │   └── 3ccfbf0b3a10958bdc6183e1a41ac6b72334ef
+│   │   ├── 4f
+│   │   │   └── 4c96544fe019d8b17d643b05321c3e6c051f1e
+│   │   ├── 55
+│   │   │   ├── 866dfa22fe99a3185c666b5348ad76ca310418
+│   │   │   └── fed8ecc393beaac603f7de3430b99e24368192
+│   │   ├── 5d
+│   │   │   └── ebc8461c88701fb15581097b0a5b05178cecfe
+│   │   ├── 62
+│   │   │   └── cd455b17648dab3f3c49dd1b50bb6a63cebee3
+│   │   ├── 63
+│   │   │   ├── 07c434ac43ad137e19475aff0f592884058c6f
+│   │   │   └── 58464ab509c388f7af153a2bbe1f47d222a4dc
+│   │   ├── 66
+│   │   │   └── 383613a490dc290d664121d83c584d0f3fa47e
+│   │   ├── 69
+│   │   │   └── f819cf1a9a28505890960008b41aa3cfc11f66
+│   │   ├── 6c
+│   │   │   └── b7c25d2ab58acf8d7a2ae16dabdae66436ddcd
+│   │   ├── 71
+│   │   │   └── 656387a181cab85bc343fa7df8a2b6e35154c5
+│   │   ├── 73
+│   │   │   └── d14d36de5d5a510434536efa1c2cff002ce02d
+│   │   ├── 75
+│   │   │   └── 75c93aca89e9f4b4c1fc0b3d25d64d1e56db59
+│   │   ├── 78
+│   │   │   └── 36d510e49527b9c45ab4f35557ad18f576725a
+│   │   ├── 7e
+│   │   │   └── b30070c078e50a99c1851d744608ca9cb7bee3
+│   │   ├── 82
+│   │   │   ├── 0a6cdd5451d50b487cdac455b348801406a8be
+│   │   │   └── ba9426d4f0f6350baf0bcc34eaddc9e996b919
+│   │   ├── 83
+│   │   │   ├── 27d51691b6f5e1f85b9ee860e230578957ad94
+│   │   │   └── 3526535728ed4381a5b62912fe2038082ddc57
+│   │   ├── 84
+│   │   │   └── 6b14c1120dfa766e5b2ab29aadff98eff1ebb2
+│   │   ├── 86
+│   │   │   └── 47907b0b1e63066dd30d8018894d228c5051bd
+│   │   ├── 87
+│   │   │   └── cc3b448cc7a2f8ab487c112047d405f4219e02
+│   │   ├── 89
+│   │   │   └── 091318f62ead0992fae96a360b0fe1ba18e4fe
+│   │   ├── 8f
+│   │   │   └── 22686bdd3f9a106b21a5b96c036a58be5bbeb2
+│   │   ├── 91
+│   │   │   ├── 1c2fc81113c387d611142881afb4a0ff89ea95
+│   │   │   └── 44774436f2093067498209550195f3f8ad1789
+│   │   ├── 92
+│   │   │   └── 99a473d141cc39cb0605a7bd9fc61f2138dac1
+│   │   ├── 93
+│   │   │   └── c3781a364ae7b3c4d7f64224fd3f45e2684520
+│   │   ├── 97
+│   │   │   ├── 5b28d5ff7910501f8e85b13711b0402f36edbc
+│   │   │   └── daf9ac3e105e4e12dcb86e32f8105f4fb0f2c0
+│   │   ├── 98
+│   │   │   └── c9f4e94dcb28d35b05137fb442adc89f1ab5af
+│   │   ├── a0
+│   │   │   ├── 62b664bf4825b20f1e8b67462b4cbf01e1513a
+│   │   │   └── 7403112f2e23c4f3fadb7f36552775491ad291
+│   │   ├── a1
+│   │   │   └── 695e4021b159751f31a24d110cf292be24a59e
+│   │   ├── a3
+│   │   │   └── d4c0a0b2c86595941a0c1fa1815656e5e99bac
+│   │   ├── a4
+│   │   │   └── c6511e7c531e49f0c5c46e41e1e2b0960e01fd
+│   │   ├── a5
+│   │   │   └── ae3983535c808639314e9e39a5655517cf9109
+│   │   ├── a8
+│   │   │   ├── 4caa6c6473dff91189842f4473ca21dc4e3a1f
+│   │   │   └── bba9599537cbb34b378399a077b525a87d497f
+│   │   ├── ab
+│   │   │   └── 7681afe2cff202165a16181b2417e12fb34eb9
+│   │   ├── ad
+│   │   │   ├── 15b3062f7ce920729c3a7cce06ac16d6668ade
+│   │   │   ├── 67c8d1322853111cf9f35c5b90e3e1d269823a
+│   │   │   └── 95cd46e8bf7f52c84da889a1c3ed7c6964812f
+│   │   ├── b2
+│   │   │   └── ff69cb9eeceb82c34e96aa8b7096875ca6f1e1
+│   │   ├── b4
+│   │   │   └── fe457068235918f7ac7ce48ffdb6cc7d801cb7
+│   │   ├── b5
+│   │   │   └── 6f1a2b5282c10e2e5f25e4f6346c17e8b8031b
+│   │   ├── b6
+│   │   │   ├── 678fab7015aced961890d71528976d996bcdf7
+│   │   │   └── db63bbd941b2b37cec36642bcb45f24f449b17
+│   │   ├── b9
+│   │   │   └── 7b1ec1670d9e8938ff650343c9236a9c84ded0
+│   │   ├── bd
+│   │   │   ├── 66014b38128ae5d05319029eefca324848ab71
+│   │   │   └── c1e7d4e0dd21384b50a929319701e2509181e5
+│   │   ├── c3
+│   │   │   └── d86956ed54c706ccb33f1a4c57cb8cd46ab567
+│   │   ├── c5
+│   │   │   └── 97e9a0b80b4c22ba876071fc46703ad1bd8f19
+│   │   ├── c6
+│   │   │   ├── 32730745a5369ce7f305aadd2893b8b6f24a8c
+│   │   │   ├── 98f8b60129d793494de058b0dd4e318c0dcb5e
+│   │   │   └── ac28729b33418f3a61fcf1689d6f69aa1b642a
+│   │   ├── c9
+│   │   │   └── 3db0fe3a1ed69742f04782b813e5edd9407724
+│   │   ├── ca
+│   │   │   └── 3a1f3f987064c69aad292a919fc6b23e09b5ec
+│   │   ├── cb
+│   │   │   └── 5d9405188e51e83b6e3a08ec2da14189bd62b2
+│   │   ├── cc
+│   │   │   ├── 19ffb3c8bef1b43c05152f882264ce724b3c0c
+│   │   │   └── 45fa325b43b0f4608ebbfcc79e45ec350c11e8
+│   │   ├── d0
+│   │   │   └── 4289af1f6430c9ddd114dc006d116a3ce24ca7
+│   │   ├── d2
+│   │   │   └── 5d6e0861388217c01c2f4284810ee39faa40a2
+│   │   ├── d3
+│   │   │   └── 3c471d4176ddd0996b1a37a67ea7fa508c32db
+│   │   ├── d4
+│   │   │   └── 0a853757d6c1a23dd91e40753b3e48693391ed
+│   │   ├── d7
+│   │   │   ├── 2d3c02b22d0d654c0d8115dcdbc716de50ca1e
+│   │   │   └── 3b1d5bbe86443f7f5a43e99dc3ee7d99e10b55
+│   │   ├── de
+│   │   │   ├── 3ac756f1ed860391cd123771f154d3c58fa0fc
+│   │   │   └── 5785051050d64bbda37a4964c2c079f0739b2b
+│   │   ├── df
+│   │   │   └── e0770424b2a19faf507a501ebfc23be8f54e7b
+│   │   ├── e2
+│   │   │   └── bf7a20c5a53aad122a347b6571de5e3a8bff49
+│   │   ├── e3
+│   │   │   └── 3ace0363f8968e43fb38c0754877ffc3f927eb
+│   │   ├── ef
+│   │   │   └── 8cb39ad6f786706cccaa3092809203e5d6b250
+│   │   ├── f0
+│   │   │   └── 6c8c5ef106ea86a8db758aa9f493be0632bad1
+│   │   ├── f3
+│   │   │   └── b23604426db1142defbe767a5fd73591116d70
+│   │   ├── fe
+│   │   │   ├── 269b84730575b095e7973286fb57bf53401f37
+│   │   │   └── fcb52d615995097953c2fee343470be662493a
+│   │   ├── ff
+│   │   │   └── 6a8888c982730786e5f2a4cf44107d6b95b522
+│   │   ├── info
+│   │   └── pack
+│   └── refs
+│       ├── heads
+│       │   └── main
+│       ├── remotes
+│       │   └── origin
+│       │       ├── HEAD
+│       │       └── main
+│       └── tags
+├── .gitattributes
+├── .gitignore
+├── LICENSE
+├── README.md
+├── datasets.rar
+├── images
+│   └── logo.png
+├── presentation
+│   ├── benchmark-compare (2).png
+│   ├── benchmark-compare.png
+│   ├── llm.png
+│   ├── model-info.png
+│   ├── numbers-and-info.png
+│   ├── price-compare.png
+│   ├── pricing.png
+│   └── training-analytics.png
+├── v0.1.0-alpha
+│   ├── app.py
+│   ├── build_run.bat
+│   ├── config.py
+│   ├── data_generator.py
+│   ├── dataset.py
+│   ├── generate.py
+│   ├── model.py
+│   ├── run.py
+│   ├── run_cmd.bat
+│   ├── run_web.bat
+│   ├── templates
+│   │   ├── card.html
+│   │   ├── index.html
+│   │   ├── newspaper.html
+│   │   ├── retro.html
+│   │   ├── space.html
+│   │   ├── split.html
+│   │   └── terminal.html
+│   ├── train.py
+│   └── vocab.py
+├── v0.1.1-alpha
+│   ├── build.bat
+│   ├── chat.py
+│   ├── config.py
+│   ├── generate_data.py
+│   ├── model.py
+│   ├── run.bat
+│   └── train.py
+├── v0.2.0-alpha
+│   ├── bench.py
+│   ├── build.bat
+│   ├── chat.py
+│   ├── config
+│   │   └── tinyllm.py
+│   ├── configurator.py
+│   ├── data
+│   │   └── tinyllm
+│   │       └── prepare.py
+│   ├── model.py
+│   ├── run.bat
+│   ├── sample.py
+│   └── train.py
+├── v0.2.1-alpha
+│   ├── bench.py
+│   ├── benchmark.bat
+│   ├── build.bat
+│   ├── chat.py
+│   ├── config
+│   │   └── tinyllm.py
+│   ├── configurator.py
+│   ├── data
+│   │   └── tinyllm
+│   │       ├── gpt2_encoder
+│   │       │   ├── encoder.json
+│   │       │   └── vocab.bpe
+│   │       └── prepare.py
+│   ├── model.py
+│   ├── run.bat
+│   ├── sample.py
+│   └── train.py
+├── v0.2.2-alpha
+│   ├── bench.py
+│   ├── benchmark.bat
+│   ├── build.bat
+│   ├── chat.py
+│   ├── config
+│   │   └── config.py
+│   ├── configurator.py
+│   ├── data
+│   │   ├── gpt2_encoder
+│   │   │   ├── encoder.json
+│   │   │   └── vocab.bpe
+│   │   └── prepare.py
+│   ├── model.py
+│   ├── run.bat
+│   ├── sample.py
+│   └── train.py
+├── v0.2.3-alpha
+│   ├── build.bat
+│   ├── chat.py
+│   ├── config
+│   │   └── config.py
+│   ├── configurator.py
+│   ├── data
+│   │   ├── gpt2_encoder
+│   │   │   ├── encoder.json
+│   │   │   └── vocab.bpe
+│   │   └── prepare.py
+│   ├── model.py
+│   ├── run.bat
+│   └── train.py
+├── v0.3.0-alpha
+│   ├── build.bat
+│   ├── chat.py
+│   ├── config
+│   │   └── config.py
+│   ├── configurator.py
+│   ├── data
+│   │   ├── gpt2_encoder
+│   │   │   ├── encoder.json
+│   │   │   └── vocab.bpe
+│   │   └── prepare.py
+│   ├── model.py
+│   ├── run.bat
+│   ├── tools.py
+│   └── train.py
+└── v0.4.0-alpha
+    ├── __pycache__
+    │   ├── download_data.cpython-311.pyc
+    │   └── prepare.cpython-311.pyc
+    ├── assets
+    │   ├── datasets
+    │   │   ├── fineweb-edu-1B-00000.parquet
+    │   │   ├── fineweb-edu-1B-00001.parquet
+    │   │   ├── fineweb-edu-1B-00002.parquet
+    │   │   ├── fineweb-edu-1B-00003.parquet
+    │   │   ├── fineweb-edu-1B-00004.parquet
+    │   │   ├── fineweb-edu-1B-00005.parquet
+    │   │   ├── fineweb-edu-1B-00006.parquet
+    │   │   ├── fineweb-edu-1B-00007.parquet
+    │   │   ├── fineweb-edu-1B-00008.parquet
+    │   │   ├── fineweb-edu-1B-00009.parquet
+    │   │   ├── identity.jsonl
+    │   │   ├── python-code-00000.parquet
+    │   │   ├── python-code-00001.parquet
+    │   │   ├── sft_code.jsonl
+    │   │   ├── sft_conversation.jsonl
+    │   │   ├── sft_knowledge.jsonl
+    │   │   ├── sft_reasoning.jsonl
+    │   │   ├── smoltalk-all-00000.parquet
+    │   │   ├── smoltalk-all-00001.parquet
+    │   │   ├── smoltalk-all-00002.parquet
+    │   │   ├── smoltalk-all-00003.parquet
+    │   │   ├── smoltalk-all-00004.parquet
+    │   │   ├── smoltalk-all-00005.parquet
+    │   │   ├── wikipedia-20231101-en-00000.parquet
+    │   │   ├── wikipedia-20231101-en-00001.parquet
+    │   │   ├── wikipedia-20231101-en-00002.parquet
+    │   │   └── wikipedia-20231101-en-00003.parquet
+    │   ├── pretrain
+    │   └── pretrain_bins
+    │       ├── fineweb.bin
+    │       ├── fineweb_mask.bin
+    │       ├── wiki.bin
+    │       └── wiki_mask.bin
+    ├── base_sample.py
+    ├── benchmark.json
+    ├── benchmark.py
+    ├── checkpoints_pretrain
+    │   ├── best.pt
+    │   ├── ckpt.pt
+    │   └── final.pt
+    ├── checkpoints_sft
+    │   ├── best.pt
+    │   ├── ckpt.pt
+    │   └── final.pt
+    ├── data_pretrain
+    │   ├── train.bin
+    │   ├── train_mask.bin
+    │   ├── val.bin
+    │   └── val_mask.bin
+    ├── data_sft
+    │   ├── train.bin
+    │   ├── train_mask.bin
+    │   ├── val.bin
+    │   └── val_mask.bin
+    ├── download_data.py
+    ├── dump_text.py
+    ├── export
+    │   └── fanoos-ai
+    ├── export_gguf.py
+    ├── export_hf.py
+    ├── fanoos
+    │   ├── __init__.py
+    │   ├── __pycache__
+    │   │   ├── __init__.cpython-311.pyc
+    │   │   ├── chat.cpython-311.pyc
+    │   │   ├── config.cpython-311.pyc
+    │   │   └── model.cpython-311.pyc
+    │   ├── chat.py
+    │   ├── config.py
+    │   └── model.py
+    ├── prepare.py
+    ├── prepare_pretrain.py
+    ├── requirements.txt
+    ├── result.txt
+    ├── run-windows.md
+    ├── serve.py
+    ├── static
+    │   └── index.html
+    ├── structure.txt
+    ├── test.py
+    ├── tokenizer
+    │   ├── tokenizer.json
+    │   └── tokenizer_config.json
+    ├── tokenizer.py
+    └── train.py

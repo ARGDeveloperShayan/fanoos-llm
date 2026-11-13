@@ -1,5 +1,5 @@
 """
-Text generation module for TinyLLM.
+Text generation module for FanoosLLM.
 Implements auto-regressive generation with greedy decoding.
 """
 
@@ -7,17 +7,17 @@ import torch
 import torch.nn.functional as F
 import config
 from vocab import Vocabulary
-from model import TinyLLMModel
+from model import FanoosLLMModel
 
 
-def generate_text(prompt: str, model: TinyLLMModel, vocab: Vocabulary,
+def generate_text(prompt: str, model: FanoosLLMModel, vocab: Vocabulary,
                   max_length: int = None, temperature: float = None, top_k: int = None) -> str:
     """
     Generate text from a prompt using the model.
     
     Args:
         prompt: Input text prompt
-        model: Trained TinyLLM model
+        model: Trained FanoosLLM model
         vocab: Vocabulary instance
         max_length: Maximum generation length (uses config if None)
         temperature: Sampling temperature (uses config if None)
@@ -80,14 +80,14 @@ def generate_text(prompt: str, model: TinyLLMModel, vocab: Vocabulary,
     return generated_text
 
 
-def generate_response(prompt: str, model: TinyLLMModel, vocab: Vocabulary,
+def generate_response(prompt: str, model: FanoosLLMModel, vocab: Vocabulary,
                      max_length: int = None, temperature: float = None, top_k: int = None) -> str:
     """
     Generate a response to a prompt (returns only the generated part, not the prompt).
     
     Args:
         prompt: Input text prompt
-        model: Trained TinyLLM model
+        model: Trained FanoosLLM model
         vocab: Vocabulary instance
         max_length: Maximum generation length
         temperature: Sampling temperature
@@ -171,14 +171,14 @@ def _sample_next_token(logits: torch.Tensor, temperature: float, top_k: int) -> 
 if __name__ == '__main__':
     # Test generation (requires a trained model)
     from vocab import Vocabulary
-    from model import TinyLLMModel
+    from model import FanoosLLMModel
     
     print("Loading vocabulary...")
     vocab = Vocabulary()
     config.VOCAB_SIZE = vocab.size
     
     print("Initializing model...")
-    model = TinyLLMModel(vocab_size=vocab.size)
+    model = FanoosLLMModel(vocab_size=vocab.size)
     
     # Try to load a trained model if it exists
     import os

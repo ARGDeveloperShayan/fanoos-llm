@@ -5,7 +5,7 @@ import pickle
 
 # -------------------- CONFIG --------------------
 NUM_EXAMPLES = 100_000          # total conversations to generate
-OUT_DIR = "data/tinyllm"
+OUT_DIR = "data/fanoosllm"
 # ------------------------------------------------
 
 os.makedirs(OUT_DIR, exist_ok=True)
@@ -98,7 +98,7 @@ def banter():
         ("Do you like math?", "I love it! Math is the language of the universe."),
         ("Tell me a joke.", "Why did the math book look sad? Too many problems!"),
         ("Thanks!", "You're welcome! Happy to help."),
-        ("What's your name?", "I'm TinyLLM, your friendly assistant."),
+        ("What's your name?", "I'm FanoosLLM, your friendly assistant."),
         ("What can you do?", "I can chat, do math, share facts, and more!"),
     ]
     user, assistant = random.choice(pairs)

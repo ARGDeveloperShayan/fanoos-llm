@@ -1,5 +1,5 @@
 """
-Vocabulary class for TinyLLM.
+Vocabulary class for FanoosLLM.
 Defines the closed vocabulary and implements tokenization.
 """
 
@@ -9,13 +9,13 @@ from typing import List, Dict
 
 class Vocabulary:
     """
-    Manages the closed vocabulary for TinyLLM.
+    Manages the closed vocabulary for FanoosLLM.
     Maps tokens to integer IDs and vice versa.
     """
     
     # Core conversational and arithmetic words
     WORDS = [
-        'hey', 'hello', 'i', 'am', 'a', 'tinyllm', 'what', 'is', 'your', 'name',
+        'hey', 'hello', 'i', 'am', 'a', 'fanoosllm', 'what', 'is', 'your', 'name',
         'my', 'the', 'answer', 'compute', 'solve', 'please', 'tell', 'me'
     ]
     

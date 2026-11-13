@@ -1,5 +1,5 @@
 """
-Training script for TinyLLM.
+Training script for FanoosLLM.
 Implements the training loop with loss calculation, optimization, and validation.
 """
 
@@ -9,8 +9,8 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 import config
 from vocab import Vocabulary
-from dataset import TinyLLMDataset
-from model import TinyLLMModel
+from dataset import FanoosLLMDataset
+from model import FanoosLLMModel
 
 
 def train_epoch(model: nn.Module, dataloader: DataLoader, criterion: nn.Module,
@@ -111,8 +111,8 @@ def validate(model: nn.Module, dataloader: DataLoader, criterion: nn.Module,
     return total_loss / num_batches if num_batches > 0 else 0.0
 
 
-def train_model(vocab: Vocabulary, train_dataset: TinyLLMDataset,
-                val_dataset: TinyLLMDataset = None) -> TinyLLMModel:
+def train_model(vocab: Vocabulary, train_dataset: FanoosLLMDataset,
+                val_dataset: FanoosLLMDataset = None) -> FanoosLLMModel:
     """
     Main training function.
     
@@ -133,7 +133,7 @@ def train_model(vocab: Vocabulary, train_dataset: TinyLLMDataset,
     print(f"Training on device: {device}")
     
     # Initialize model
-    model = TinyLLMModel(vocab_size=vocab.size)
+    model = FanoosLLMModel(vocab_size=vocab.size)
     model = model.to(device)
     
     # Count parameters
@@ -220,7 +220,7 @@ def train_model(vocab: Vocabulary, train_dataset: TinyLLMDataset,
 if __name__ == '__main__':
     # Test training setup
     from vocab import Vocabulary
-    from dataset import TinyLLMDataset
+    from dataset import FanoosLLMDataset
     
     print("Initializing vocabulary...")
     vocab = Vocabulary()
@@ -229,8 +229,8 @@ if __name__ == '__main__':
     print(f"Vocabulary size: {vocab.size}")
     
     print("Creating datasets...")
-    train_dataset = TinyLLMDataset(vocab, num_examples=100)
-    val_dataset = TinyLLMDataset(vocab, num_examples=20)
+    train_dataset = FanoosLLMDataset(vocab, num_examples=100)
+    val_dataset = FanoosLLMDataset(vocab, num_examples=20)
     
     print(f"Train dataset size: {len(train_dataset)}")
     print(f"Val dataset size: {len(val_dataset)}")

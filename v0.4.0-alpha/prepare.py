@@ -10,29 +10,20 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 DATA_ROOT = os.path.join(PROJECT_ROOT, "assets", "datasets")
 
 DATASETS = [
-    # ---- Conversation ----
-    ("everyday-conversations-llama3.1-2k.parquet", "conversation"),
-
-    # ---- Code ----
-    ("python-code-instructions-85k.jsonl", "code"),
-    ("code_review_improvement.parquet", "code"),
-    ("complexity_edge_cases.parquet", "code"),
-    ("explain_code_concept.parquet", "code"),
-    ("library_api_usage.parquet", "code"),
-    ("refactor_discussion.parquet", "code"),
-
-    # ---- Knowledge ----
-    ("databricks-dolly-15k.jsonl", "knowledge"),
-
-    # ---- Reasoning ----
+    ("sft_conversation.jsonl", "conversation"),
+    ("identity.jsonl", "conversation"),
+    ("sft_knowledge.jsonl", "knowledge"),
+    ("sft_reasoning.jsonl", "reasoning"),
     ("General_Inquiry_Thinking-Chain-Of-Thought_6K.json", "reasoning"),
+    ("sft_code.jsonl", "code"),
+    ("python-code-instructions-85k.jsonl", "code"),
 ]
 
 CATEGORY_WEIGHTS = {
     "conversation": 0.30,
-    "code": 0.30,
-    "knowledge": 0.25,
-    "reasoning": 0.15,
+    "knowledge": 0.45,
+    "reasoning": 0.08,
+    "code": 0.17,
 }
 
 DROP_KEYWORDS = (
@@ -47,6 +38,11 @@ BAD_SHORT_ASSISTANT = {
     "neutral", "contradiction", "positive", "negative",
     "yes.", "no.", "entailed.", "neutral.", "a", "b", "c", "d",
 }
+
+BAD_ASSISTANT = (
+    "as an ai", "confusion, but", "personal data", "real-time",
+    "i'm sorry, but i can", "i cannot assist", "text-based ai", "knowledge cutoff",
+)
 
 _ROLE_MAP = {
     "system": "system", "user": "user", "assistant": "assistant",
@@ -78,6 +74,9 @@ def is_chat_worthy(messages):
         "hi", "hello", "hey", "thanks", "thank you"
     ):
         return False
+    a = " ".join(m["content"].lower() for m in messages if m["role"] == "assistant")
+    if any(p in a for p in BAD_ASSISTANT): return False
+    if messages[0]["role"] == "system": return False      # persona prompts
     return True
 
 def _coerce_role(r):
@@ -109,7 +108,6 @@ def _from_messages_field(msgs):
 def adapt_record(rec):
     if not isinstance(rec, dict):
         return None
-
     for key in ("messages", "conversation", "conversations", "turns",
                 "dialogue", "chat", "conversation_history"):
         v = _to_plain_list(rec.get(key))
@@ -117,7 +115,6 @@ def adapt_record(rec):
             msgs = _from_messages_field(v)
             if msgs and len(msgs) >= 2:
                 return msgs
-
     inst = rec.get("instruction") or rec.get("prompt") or rec.get("question") or rec.get("query")
     out = rec.get("output") or rec.get("response") or rec.get("answer") or rec.get("completion") or rec.get("chosen")
     ctx = rec.get("input") or rec.get("context") or rec.get("passage") or ""
@@ -125,13 +122,11 @@ def adapt_record(rec):
         user = f"{inst.strip()}\n\n{ctx.strip()}" if isinstance(ctx, str) and ctx.strip() else inst.strip()
         return [{"role": "user", "content": user},
                 {"role": "assistant", "content": out.strip()}]
-
     q = rec.get("question")
     a = rec.get("answer")
     if isinstance(q, str) and isinstance(a, str) and q.strip() and a.strip():
         return [{"role": "user", "content": q.strip()},
                 {"role": "assistant", "content": a.strip()}]
-
     return None
 
 def _load_jsonl(path):
@@ -151,12 +146,10 @@ def _load_json(path):
 def _load_parquet(path):
     try:
         import pandas as pd
-        df = pd.read_parquet(path)
-        return df.to_dict(orient="records")
+        return pd.read_parquet(path).to_dict(orient="records")
     except Exception:
         from datasets import load_dataset
-        ds = load_dataset("parquet", data_files=path, split="train")
-        return [dict(r) for r in ds]
+        return [dict(r) for r in load_dataset("parquet", data_files=path, split="train")]
 
 def load_file(path):
     if path.endswith(".jsonl"):
@@ -172,56 +165,33 @@ def load_all():
     for fname, cat in DATASETS:
         path = os.path.join(DATA_ROOT, fname)
         if not os.path.isfile(path):
-            print(f"[prepare] MISSING: {path} (skipping)")
+            print(f"[prepare] MISSING: {path}")
             continue
         raw = load_file(path)
         kept = 0
         for rec in raw:
             msgs = adapt_record(rec)
-            if msgs and len(msgs) >= 2 and is_chat_worthy(msgs):
+            if msgs and len(msgs) >= 2 and (fname.startswith("identity") or is_chat_worthy(msgs)):
                 by_category[cat].append(msgs)
                 kept += 1
         print(f"[prepare] {fname:55s} {kept:>7,}/{len(raw):>7,} kept  [{cat}]")
     return by_category
 
-def mix_datasets(by_category, seed=1234, cap_total=500_000):
+def mix_datasets(by_category, seed=1234, cap_total=300_000):
     rng = random.Random(seed)
     for cat in by_category:
         rng.shuffle(by_category[cat])
-
     total = sum(len(v) for v in by_category.values())
-
     for cat in by_category:
         print(f"[prepare] pool '{cat}': {len(by_category[cat]):,} records")
-
     if total <= cap_total:
         mixed = [m for pool in by_category.values() for m in pool]
         rng.shuffle(mixed)
-        print(f"[prepare] total under cap ({total:,} <= {cap_total:,}), using all")
         return mixed
-
-    take = {cat: 0 for cat in by_category}
-    for cat in by_category:
-        target = int(cap_total * CATEGORY_WEIGHTS[cat])
-        take[cat] = min(target, len(by_category[cat]))
-
-    slack = cap_total - sum(take.values())
-    while slack > 0:
-        candidates = [c for c in by_category if take[c] < len(by_category[c])]
-        if not candidates:
-            break
-        wsum = sum(CATEGORY_WEIGHTS[c] for c in candidates)
-        progressed = 0
-        for c in candidates:
-            bonus = int(slack * CATEGORY_WEIGHTS[c] / wsum)
-            can = min(bonus, len(by_category[c]) - take[c], slack)
-            if can > 0:
-                take[c] += can
-                progressed += can
-                slack -= can
-        if progressed == 0:
-            break
-
+    take = {
+        cat: min(int(cap_total * CATEGORY_WEIGHTS[cat]), len(by_category[cat]))
+        for cat in by_category
+    }
     mixed = []
     for cat in by_category:
         mixed.extend(by_category[cat][:take[cat]])
@@ -229,81 +199,104 @@ def mix_datasets(by_category, seed=1234, cap_total=500_000):
     rng.shuffle(mixed)
     return mixed
 
-def render_chatml_ids(messages, tok, special):
+def render_chatml_ids(messages, tok, special, role_ids):
     im_start, im_end = special["im_start"], special["im_end"]
-    ids, loss = [], []
+    ids, mask = [], []
     system_done = False
     for m in messages:
-        role, content = m["role"], m["content"].strip()
+        role = m["role"]
+        content = m["content"].strip()
         if role == "system" and not system_done:
             chunk = [im_start] + tok.encode(f"system\n{content}", add_special_tokens=False) + [im_end]
-            ids += chunk
-            loss += [0] * len(chunk)
+            ids.extend(chunk)
+            mask.extend([0] * len(chunk))
             system_done = True
             continue
         if role == "system":
             continue
         if not system_done:
             chunk = [im_start] + tok.encode(f"system\n{DEFAULT_SYSTEM_PROMPT}", add_special_tokens=False) + [im_end]
-            ids += chunk
-            loss += [0] * len(chunk)
+            ids.extend(chunk)
+            mask.extend([0] * len(chunk))
             system_done = True
-
-        role_ids = tok.encode(f"{role}\n", add_special_tokens=False)
+        rid = role_ids.get(role)
+        if rid is None:
+            rid = tok.encode(f"{role}\n", add_special_tokens=False)
         content_ids = tok.encode(content, add_special_tokens=False)
-        chunk = [im_start] + role_ids + content_ids + [im_end]
-        ids += chunk
+        chunk = [im_start] + rid + content_ids + [im_end]
+        ids.extend(chunk)
         if role == "assistant":
-            loss += [0] * (1 + len(role_ids)) + [1] * (len(content_ids) + 1)
+            mask.extend([0] * (1 + len(rid)))
+            mask.extend([1] * (len(content_ids) + 1))
         else:
-            loss += [0] * len(chunk)
-    return ids, loss
+            mask.extend([0] * len(chunk))
+    return ids, mask
 
-def tokenize_records(records, tok, special):
+def tokenize_records(records, tok, special, tmp_stream, tmp_mask, block_size):
     from tqdm import tqdm
-    stream, mask = [], []
-    for msgs in tqdm(records, desc="tokenizing", unit="doc"):
-        ids, lm = render_chatml_ids(msgs, tok, special)
-        stream.extend(ids)
-        mask.extend(lm)
-    return stream, mask
+    pad = special["pad"]
+    role_ids = {"user": tok.encode("user\n", add_special_tokens=False),
+                "assistant": tok.encode("assistant\n", add_special_tokens=False)}
+    buf_i, buf_m = [], []
+    n_docs = n_blocks = dropped = 0
 
-def pack_and_save(stream, loss_mask, block_size, data_dir, val_fraction):
+    def flush(fs, fm):
+        nonlocal buf_i, buf_m, n_blocks
+        k = block_size - len(buf_i)
+        np.asarray(buf_i + [pad] * k, dtype=np.uint32).tofile(fs)
+        np.asarray(buf_m + [0] * k, dtype=np.uint8).tofile(fm)
+        buf_i, buf_m = [], []
+        n_blocks += 1
+
+    with open(tmp_stream, "wb") as fs, open(tmp_mask, "wb") as fm:
+        for msgs in tqdm(records, desc="tokenizing", unit="doc"):
+            ids, mask = render_chatml_ids(msgs, tok, special, role_ids)
+            if len(ids) > block_size:
+                dropped += 1
+                continue
+            if len(buf_i) + len(ids) > block_size:
+                flush(fs, fm)
+            buf_i += ids; buf_m += mask; n_docs += 1
+        if buf_i:
+            flush(fs, fm)
+    return n_docs, n_blocks, dropped
+
+def pack_and_save(tmp_stream, tmp_mask, block_size, data_dir, val_fraction):
+    stream = np.fromfile(tmp_stream, dtype=np.uint32)
+    mask = np.fromfile(tmp_mask, dtype=np.uint8)
     n_blocks = len(stream) // block_size
     if n_blocks < 2:
-        raise ValueError(f"Only {n_blocks} full blocks — not enough data.")
-    arr = np.array(stream[: n_blocks * block_size], dtype=np.uint32).reshape(n_blocks, block_size)
-    mask = np.array(loss_mask[: n_blocks * block_size], dtype=np.uint8).reshape(n_blocks, block_size)
-    # perm = np.random.default_rng(1234).permutation(n_blocks)
-    # arr, mask = arr[perm], mask[perm]
+        raise SystemExit(f"[prepare] only {n_blocks} blocks — not enough data")
+    arr = stream[: n_blocks * block_size].reshape(n_blocks, block_size)
+    msk = mask[: n_blocks * block_size].reshape(n_blocks, block_size)
+    perm = np.random.default_rng(1234).permutation(n_blocks)
+    arr, msk = arr[perm], msk[perm]
     n_val = max(1, int(n_blocks * val_fraction))
     val, train = arr[:n_val], arr[n_val:]
-    val_mask, train_mask = mask[:n_val], mask[n_val:]
+    val_mask, train_mask = msk[:n_val], msk[n_val:]
     os.makedirs(data_dir, exist_ok=True)
     train.tofile(os.path.join(data_dir, "train.bin"))
     val.tofile(os.path.join(data_dir, "val.bin"))
     train_mask.tofile(os.path.join(data_dir, "train_mask.bin"))
     val_mask.tofile(os.path.join(data_dir, "val_mask.bin"))
     live = int(train_mask.sum())
-    print(f"[prepare] train.bin: {train.shape}, val.bin: {val.shape}")
-    print(f"[prepare] loss mask: {live / train_mask.size * 100:.1f}% assistant tokens")
+    print(f"[prepare] train {train.shape} | val {val.shape}")
+    print(f"[prepare] assistant tokens: {live / train_mask.size * 100:.1f}%")
     print(f"[prepare] total tokens: {len(stream):,} | blocks: {n_blocks:,}")
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--block-size", type=int, default=None)
-    # ap.add_argument("--val-fraction", type=float, default=0.002)
     ap.add_argument("--data-dir", type=str, default=None)
-    # ap.add_argument("--cap-total", type=int, default=500_000)
-    
     ap.add_argument("--val-fraction", type=float, default=0.01)
-    ap.add_argument("--cap-total", type=int, default=50_000)
+    ap.add_argument("--cap-total", type=int, default=300_000)
     args = ap.parse_args()
 
     from fanoos import FanoosConfig
     cfg = FanoosConfig()
     block_size = args.block_size or cfg.block_size
     data_dir = args.data_dir or os.path.join(PROJECT_ROOT, cfg.data_dir)
+    os.makedirs(data_dir, exist_ok=True)
 
     tok, special = load_tokenizer()
     print(f"[prepare] tokenizer vocab: {len(tok):,}")
@@ -311,10 +304,19 @@ def main():
 
     by_category = load_all()
     records = mix_datasets(by_category, cap_total=args.cap_total)
-    print(f"[prepare] mixed {len(records):,} records total")
+    print(f"[prepare] mixed {len(records):,} records")
 
-    stream, loss_mask = tokenize_records(records, tok, special)
-    pack_and_save(stream, loss_mask, block_size, data_dir, args.val_fraction)
+    tmp_stream = os.path.join(data_dir, "_stream.tmp")
+    tmp_mask = os.path.join(data_dir, "_mask.tmp")
+    n_kept, n_blocks, dropped = tokenize_records(
+        records, tok, special, tmp_stream, tmp_mask, block_size
+    )
+    print(f"[prepare] kept {n_kept:,} records, {n_blocks:,} blocks, dropped {dropped:,} over-length")
+
+    pack_and_save(tmp_stream, tmp_mask, block_size, data_dir, args.val_fraction)
+
+    os.remove(tmp_stream)
+    os.remove(tmp_mask)
     print("[prepare] done.")
 
 if __name__ == "__main__":

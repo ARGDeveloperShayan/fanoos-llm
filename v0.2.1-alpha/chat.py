@@ -42,7 +42,7 @@ def load_model(ckpt_path):
     return model, config
 
 # ---------- Tokenizer setup ----------
-meta_path = os.path.join('data', 'tinyllm', 'meta.pkl')
+meta_path = os.path.join('data', 'fanoosllm', 'meta.pkl')
 if os.path.exists(meta_path):
     with open(meta_path, 'rb') as f:
         meta = pickle.load(f)
@@ -56,8 +56,8 @@ if os.path.exists(meta_path):
         tokenizer_type = 'char'
     else:
         enc = load_gpt2_encoding_offline(
-            "data/tinyllm/gpt2_encoder/encoder.json",
-            "data/tinyllm/gpt2_encoder/vocab.bpe"
+            "data/fanoosllm/gpt2_encoder/encoder.json",
+            "data/fanoosllm/gpt2_encoder/vocab.bpe"
         )
         def encode(s):
             return enc.encode(s, allowed_special={"<|endoftext|>"})
@@ -67,8 +67,8 @@ if os.path.exists(meta_path):
         tokenizer_type = 'bpe'
 else:
     enc = load_gpt2_encoding_offline(
-        "data/tinyllm/gpt2_encoder/encoder.json",
-        "data/tinyllm/gpt2_encoder/vocab.bpe"
+        "data/fanoosllm/gpt2_encoder/encoder.json",
+        "data/fanoosllm/gpt2_encoder/vocab.bpe"
     )
     encode = lambda s: enc.encode(s, allowed_special={"<|endoftext|>"})
     decode = lambda ids: enc.decode(ids)
@@ -83,12 +83,12 @@ def clear_screen():
 
 def show_help():
     print("\n" + "="*50)
-    print("TinyLLM Chat (BPE)")
+    print("FanoosLLM Chat (BPE)")
     print("Commands: /exit, /reload, /clear, /temp <value>")
     print("="*50 + "\n")
 
 # ---------- Load initial model ----------
-ckpt = os.path.join('tinyllm', 'ckpt.pt')
+ckpt = os.path.join('fanoosllm', 'ckpt.pt')
 model, config = load_model(ckpt)
 temperature = 0.8
 

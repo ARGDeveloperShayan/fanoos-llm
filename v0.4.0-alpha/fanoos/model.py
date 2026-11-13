@@ -147,8 +147,7 @@ class Attention(nn.Module):
         else:
             past_len = physical
 
-        positions = torch.arange(past_len, past_len + T, device=x.device)
-        cos, sin = self.rope(positions)
+        cos, sin = self.rope.get_range(past_len, T, x.device)
         q = apply_rope(q, cos, sin)
         k = apply_rope(k, cos, sin)
 
@@ -325,7 +324,8 @@ class FanoosLLM(nn.Module):
         top_k: int = 50,
         top_p: float = 0.95,
         eos_token_id: Optional[int] = None,
-        past_key_values: Optional[KVCache] = None,
+        past_key_values=None,
+        repetition_penalty: float = 1.1
     ) -> torch.Tensor:
         self.eval()
         device = idx.device
@@ -333,7 +333,12 @@ class FanoosLLM(nn.Module):
 
         logits, _, cache = self(idx, past_key_values=past_key_values, use_cache=True)
         for _ in range(max_new_tokens):
-            next_tok = self._sample(logits[:, -1, :], temperature, top_k, top_p)
+            lg = logits[:, -1, :]
+            if repetition_penalty != 1.0:
+                recent = idx[:, -128:]
+                s = lg.gather(1, recent)
+                lg = lg.scatter(1, recent, torch.where(s < 0, s * repetition_penalty, s / repetition_penalty))
+            next_tok = self._sample(lg, temperature, top_k, top_p)
             next_tok = next_tok.masked_fill(finished[:, None], self.cfg.vocab_size - 1)
             if eos_token_id is not None:
                 finished |= next_tok.squeeze(1) == eos_token_id
@@ -361,6 +366,12 @@ class FanoosLLM(nn.Module):
             {"params": no_decay, "weight_decay": 0.0},
         ]
         return groups, betas, lr
+
+def clean_state_dict(state_dict):
+    if not any(k.startswith("_orig_mod.") for k in state_dict):
+        return state_dict
+    prefix = "_orig_mod."
+    return {k[len(prefix):] if k.startswith(prefix) else k: v for k, v in state_dict.items()}
 
 def build_model(cfg: Optional[FanoosConfig] = None, tokenizer_vocab: Optional[int] = None,
                 device: str = "cpu") -> FanoosLLM:

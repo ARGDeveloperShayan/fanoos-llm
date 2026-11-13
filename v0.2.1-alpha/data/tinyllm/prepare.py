@@ -27,7 +27,7 @@ def load_gpt2_encoding_offline(encoder_json_path, vocab_bpe_path):
 
 # -------------------- CONFIG --------------------
 NUM_EXAMPLES = 100_000
-OUT_DIR = "data/tinyllm"
+OUT_DIR = "data/fanoosllm"
 # ------------------------------------------------
 
 os.makedirs(OUT_DIR, exist_ok=True)
@@ -119,7 +119,7 @@ def banter():
         ("Do you like math?", "I love it! Math is the language of the universe."),
         ("Tell me a joke.", "Why did the math book look sad? Too many problems!"),
         ("Thanks!", "You're welcome! Happy to help."),
-        ("What's your name?", "I'm TinyLLM, your friendly assistant."),
+        ("What's your name?", "I'm FanoosLLM, your friendly assistant."),
         ("What can you do?", "I can chat, do math, share facts, and more!"),
     ]
     user, assistant = random.choice(pairs)
@@ -166,8 +166,8 @@ print(f"Raw text saved to {OUT_DIR}/input.txt")
 print("Encoding with GPT-2 BPE tokenizer...")
 
 enc = load_gpt2_encoding_offline(
-    "data/tinyllm/gpt2_encoder/encoder.json",
-    "data/tinyllm/gpt2_encoder/vocab.bpe"
+    "data/fanoosllm/gpt2_encoder/encoder.json",
+    "data/fanoosllm/gpt2_encoder/vocab.bpe"
 )
 
 full_text = "".join(data_lines)

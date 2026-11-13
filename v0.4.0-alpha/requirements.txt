@@ -1,0 +1,14 @@
+numpy>=1.26
+torch>=2.4
+transformers>=4.44
+tokenizers>=0.19
+safetensors>=0.4
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.7
+pandas>=2.2
+pyarrow>=16.0
+tqdm>=4.66
+datasets>=2.20
+huggingface_hub>=0.24
+# bitsandbytes>=0.45

@@ -1,0 +1,1392 @@
+PS D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha> Remove-Item assets\datasets\identity.jsonl -ErrorAction SilentlyContinue
+
+PS D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha> python -c "import download_data as d; d.dump_identity()"
+[download] identity: DONE  1,360 lines, ~24.2K tokens, 214.9 KB
+
+PS D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha> python tokenizer.py --vocab-size 32000 --cap-records 100000
+[tokenizer] training BPE vocab=32000 on ≤100000 docs…
+[00:00:36] Pre-processing sequences       ████████████████████████████████████████████████████ 0        /        0[00:00:00] Tokenize words                 ████████████████████████████████████████████████████ 173780   /   173780
+[00:00:00] Count pairs                    ████████████████████████████████████████████████████ 173780   /   173780
+[00:00:02] Compute merges                 ████████████████████████████████████████████████████ 31740    /    31740
+[tokenizer] saved to D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\tokenizer  |  vocab_size=32000
+[tokenizer] round-trip: '<|im_start|>user\nhi<|im_end|>'
+
+PS D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha> python -c "from fanoos import load_tokenizer; t,_=load_tokenizer(); print('vocab:', len(t))"
+vocab: 32000
+
+PS D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha> python prepare_pretrain.py
+[prep] fineweb: tokenizing 10 file(s)
+[prep] fineweb: 0.91B tokens
+[prep] wiki: tokenizing 4 file(s)
+[prep] wiki: 0.55B tokens
+[prep] skip cosmo: no files matching cosmopedia-v2-*.parquet
+[prep] skip python: no text column in python-code-00000.parquet
+[prep] merge: available 1.46B, target 1.46B
+[prep] merge: 1/1278 chunks, 0.00B tokens
+[prep] merge: 51/1278 chunks, 0.05B tokens
+[prep] merge: 101/1278 chunks, 0.10B tokens
+[prep] merge: 151/1278 chunks, 0.15B tokens
+[prep] merge: 201/1278 chunks, 0.20B tokens
+[prep] merge: 251/1278 chunks, 0.25B tokens
+[prep] merge: 301/1278 chunks, 0.30B tokens
+[prep] merge: 351/1278 chunks, 0.35B tokens
+[prep] merge: 401/1278 chunks, 0.40B tokens
+[prep] merge: 451/1278 chunks, 0.45B tokens
+[prep] merge: 501/1278 chunks, 0.50B tokens
+[prep] merge: 551/1278 chunks, 0.55B tokens
+[prep] merge: 601/1278 chunks, 0.60B tokens
+[prep] merge: 651/1278 chunks, 0.65B tokens
+[prep] merge: 701/1278 chunks, 0.70B tokens
+[prep] merge: 751/1278 chunks, 0.75B tokens
+[prep] merge: 801/1278 chunks, 0.80B tokens
+[prep] merge: 851/1278 chunks, 0.85B tokens
+[prep] merge: 901/1278 chunks, 0.90B tokens
+[prep] merge: 951/1278 chunks, 0.95B tokens
+[prep] merge: 1001/1278 chunks, 1.00B tokens
+[prep] merge: 1051/1278 chunks, 1.05B tokens
+[prep] merge: 1101/1278 chunks, 1.10B tokens
+[prep] merge: 1151/1278 chunks, 1.15B tokens
+[prep] merge: 1201/1278 chunks, 1.20B tokens
+[prep] merge: 1251/1278 chunks, 1.25B tokens
+[prep] done: train 1.27B | val 4M tokens
+
+PS D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha> python train.py --preset fanoos-130m --data-dir data_pretrain --ckpt-dir checkpoints_pretrain `
+>>   --micro-batch 16 --grad-accum 8 --max-iters 12000 `
+>>   --lr 6e-4 --min-lr 6e-5 --warmup 300 --dropout 0 --compile --no-ckpt
+FanoosConfig(
+  vocab_size=32000
+  vocab_size_padded_multiple=128
+  block_size=512
+  sliding_window_size=512
+  n_layer=12
+  n_head=8
+  n_kv_head=2
+  n_embd=768
+  ffn_dim=2048
+  rope_theta=10000.0
+  dropout=0.0
+  bias=False
+  rms_norm_eps=1e-05
+  tie_word_embeddings=True
+  temperature=0.6
+  top_k=50
+  top_p=0.95
+  micro_batch_size=16
+  gradient_accumulation_steps=8
+  max_train_iters=12000
+  learning_rate=0.0006
+  min_learning_rate=6e-05
+  warmup_iters=300
+  weight_decay=0.1
+  grad_clip=1.0
+  tokenizer_dir='tokenizer'
+  data_dir='data_pretrain'
+  checkpoint_dir='checkpoints_pretrain'
+  export_dir='export'
+)
+[train] tokenizer vocab 32,000 -> model vocab 32,000
+[train] train.bin: 1,273,529,344 tokens | val.bin: 3,999,744 tokens
+[train] parameters: 98.91M
+[train] gradient checkpointing: OFF
+[train] torch.compile: ON
+[train] optimizer: AdamW8bit
+[train] bitsandbytes not installed. To install, run: pip install bitsandbytes
+[train] starting: 12000 iters | effective batch 65,536 tokens/step
+W1112 15:35:04.277000 385052 site-packages\torch\_inductor\utils.py:1709] [0/0] Not enough SMs to use max_autotune_gemm mode
+iter      0/12000 | loss 10.5320 | lr 2.00e-06 | step 33.85s | 2k tok/s
+iter      1/12000 | loss 10.5018 | lr 4.00e-06 | step 1.69s | 4k tok/s
+iter      2/12000 | loss 10.4317 | lr 6.00e-06 | step 1.73s | 5k tok/s
+iter      3/12000 | loss 10.3353 | lr 8.00e-06 | step 1.67s | 7k tok/s
+iter      4/12000 | loss 10.2513 | lr 1.00e-05 | step 1.67s | 8k tok/s
+iter      5/12000 | loss 10.0015 | lr 1.20e-05 | step 1.67s | 9k tok/s
+iter      6/12000 | loss 9.9454 | lr 1.40e-05 | step 1.67s | 10k tok/s
+iter      7/12000 | loss 9.7929 | lr 1.60e-05 | step 1.67s | 11k tok/s
+iter      8/12000 | loss 9.5341 | lr 1.80e-05 | step 1.66s | 12k tok/s
+iter      9/12000 | loss 9.4799 | lr 2.00e-05 | step 1.67s | 13k tok/s
+iter     10/12000 | loss 9.4650 | lr 2.20e-05 | step 1.67s | 14k tok/s
+iter     11/12000 | loss 9.3939 | lr 2.40e-05 | step 1.67s | 15k tok/s
+iter     12/12000 | loss 9.3512 | lr 2.60e-05 | step 1.67s | 16k tok/s
+iter     13/12000 | loss 9.2486 | lr 2.80e-05 | step 1.67s | 16k tok/s
+iter     14/12000 | loss 9.2295 | lr 3.00e-05 | step 1.67s | 17k tok/s
+iter     15/12000 | loss 9.1382 | lr 3.20e-05 | step 1.67s | 18k tok/s
+iter     16/12000 | loss 9.1794 | lr 3.40e-05 | step 1.67s | 18k tok/s
+iter     17/12000 | loss 9.0978 | lr 3.60e-05 | step 1.66s | 19k tok/s
+iter     18/12000 | loss 9.0741 | lr 3.80e-05 | step 1.67s | 19k tok/s
+iter     19/12000 | loss 9.0612 | lr 4.00e-05 | step 1.67s | 20k tok/s
+iter     20/12000 | loss 9.0098 | lr 4.20e-05 | step 1.67s | 20k tok/s
+iter     30/12000 | loss 8.5339 | lr 6.20e-05 | step 1.69s | 24k tok/s
+iter     40/12000 | loss 8.2056 | lr 8.20e-05 | step 1.68s | 27k tok/s
+iter     50/12000 | loss 7.6380 | lr 1.02e-04 | step 1.66s | 28k tok/s
+iter     60/12000 | loss 7.3032 | lr 1.22e-04 | step 1.67s | 30k tok/s
+iter     70/12000 | loss 7.0272 | lr 1.42e-04 | step 1.67s | 31k tok/s
+iter     80/12000 | loss 6.8396 | lr 1.62e-04 | step 1.67s | 32k tok/s
+iter     90/12000 | loss 6.6237 | lr 1.82e-04 | step 1.67s | 32k tok/s
+iter    100/12000 | loss 6.5188 | lr 2.02e-04 | step 1.66s | 33k tok/s
+[eval] iter 100: train 6.5049 val 6.5164 (ppl 676.17)
+iter    110/12000 | loss 6.2190 | lr 2.22e-04 | step 1.66s | 31k tok/s
+iter    120/12000 | loss 6.2068 | lr 2.42e-04 | step 1.65s | 32k tok/s
+iter    130/12000 | loss 6.1367 | lr 2.62e-04 | step 1.65s | 32k tok/s
+iter    140/12000 | loss 6.0448 | lr 2.82e-04 | step 1.65s | 33k tok/s
+iter    150/12000 | loss 5.9049 | lr 3.02e-04 | step 1.65s | 33k tok/s
+iter    160/12000 | loss 5.8856 | lr 3.22e-04 | step 1.65s | 33k tok/s
+iter    170/12000 | loss 5.8099 | lr 3.42e-04 | step 1.65s | 34k tok/s
+iter    180/12000 | loss 5.7118 | lr 3.62e-04 | step 1.69s | 34k tok/s
+iter    190/12000 | loss 5.7069 | lr 3.82e-04 | step 1.72s | 34k tok/s
+iter    200/12000 | loss 5.5793 | lr 4.02e-04 | step 1.66s | 34k tok/s
+[eval] iter 200: train 5.5857 val 5.6156 (ppl 274.67)
+iter    210/12000 | loss 5.6291 | lr 4.22e-04 | step 1.67s | 34k tok/s
+iter    220/12000 | loss 5.3627 | lr 4.42e-04 | step 1.65s | 35k tok/s
+iter    230/12000 | loss 5.4033 | lr 4.62e-04 | step 1.66s | 35k tok/s
+iter    240/12000 | loss 5.5036 | lr 4.82e-04 | step 1.71s | 35k tok/s
+iter    250/12000 | loss 5.3154 | lr 5.02e-04 | step 1.71s | 35k tok/s
+[train] checkpoint saved to D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\checkpoints_pretrain\ckpt.pt
+iter    260/12000 | loss 5.4615 | lr 5.22e-04 | step 1.66s | 35k tok/s
+iter    270/12000 | loss 5.1707 | lr 5.42e-04 | step 1.66s | 35k tok/s
+iter    280/12000 | loss 5.3420 | lr 5.62e-04 | step 1.66s | 35k tok/s
+iter    290/12000 | loss 5.2470 | lr 5.82e-04 | step 1.63s | 35k tok/s
+iter    300/12000 | loss 5.0982 | lr 6.00e-04 | step 1.68s | 35k tok/s
+[eval] iter 300: train 5.1422 val 5.2269 (ppl 186.22)
+iter    310/12000 | loss 5.3618 | lr 6.00e-04 | step 1.66s | 35k tok/s
+iter    320/12000 | loss 5.0629 | lr 6.00e-04 | step 1.65s | 35k tok/s
+iter    330/12000 | loss 5.1501 | lr 6.00e-04 | step 1.66s | 35k tok/s
+iter    340/12000 | loss 4.9922 | lr 6.00e-04 | step 1.73s | 36k tok/s
+iter    350/12000 | loss 5.1238 | lr 6.00e-04 | step 1.77s | 36k tok/s
+iter    360/12000 | loss 4.9769 | lr 6.00e-04 | step 1.72s | 36k tok/s
+iter    370/12000 | loss 4.9629 | lr 6.00e-04 | step 1.77s | 34k tok/s
+iter    380/12000 | loss 4.8568 | lr 6.00e-04 | step 1.78s | 34k tok/s
+iter    390/12000 | loss 4.9030 | lr 6.00e-04 | step 1.65s | 34k tok/s
+iter    400/12000 | loss 4.8766 | lr 6.00e-04 | step 1.65s | 34k tok/s
+[eval] iter 400: train 4.7926 val 4.8680 (ppl 130.06)
+iter    410/12000 | loss 4.7085 | lr 6.00e-04 | step 1.66s | 34k tok/s
+iter    420/12000 | loss 4.7242 | lr 6.00e-04 | step 1.65s | 34k tok/s
+iter    430/12000 | loss 4.7145 | lr 6.00e-04 | step 1.66s | 34k tok/s
+iter    440/12000 | loss 4.6237 | lr 6.00e-04 | step 1.69s | 34k tok/s
+iter    450/12000 | loss 4.7822 | lr 6.00e-04 | step 1.71s | 34k tok/s
+iter    460/12000 | loss 4.7229 | lr 6.00e-04 | step 1.64s | 34k tok/s
+iter    470/12000 | loss 4.5426 | lr 6.00e-04 | step 1.74s | 35k tok/s
+iter    480/12000 | loss 4.3700 | lr 6.00e-04 | step 1.63s | 35k tok/s
+iter    490/12000 | loss 4.4967 | lr 6.00e-04 | step 1.64s | 35k tok/s
+iter    500/12000 | loss 4.5511 | lr 6.00e-04 | step 1.67s | 35k tok/s
+[eval] iter 500: train 4.5556 val 4.6502 (ppl 104.60)
+[train] checkpoint saved to D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\checkpoints_pretrain\ckpt.pt
+.
+.
+.
+[eval] iter 11500: train 3.1874 val 3.3152 (ppl 27.53)
+[train] checkpoint saved to D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\checkpoints_pretrain\ckpt.pt
+iter  11510/12000 | loss 2.9816 | lr 6.23e-05 | step 1.55s | 37k tok/s
+iter  11520/12000 | loss 3.1205 | lr 6.22e-05 | step 1.53s | 37k tok/s
+iter  11530/12000 | loss 3.1918 | lr 6.21e-05 | step 1.50s | 37k tok/s
+iter  11540/12000 | loss 3.0159 | lr 6.21e-05 | step 1.52s | 37k tok/s
+iter  11550/12000 | loss 3.3246 | lr 6.20e-05 | step 1.46s | 37k tok/s
+iter  11560/12000 | loss 3.0969 | lr 6.19e-05 | step 1.54s | 37k tok/s
+iter  11570/12000 | loss 3.1791 | lr 6.18e-05 | step 1.48s | 37k tok/s
+iter  11580/12000 | loss 3.1947 | lr 6.17e-05 | step 1.54s | 37k tok/s
+iter  11590/12000 | loss 3.1157 | lr 6.16e-05 | step 1.57s | 37k tok/s
+iter  11600/12000 | loss 3.0805 | lr 6.16e-05 | step 1.52s | 37k tok/s
+[eval] iter 11600: train 3.1847 val 3.2838 (ppl 26.68)
+iter  11610/12000 | loss 3.0755 | lr 6.15e-05 | step 1.52s | 37k tok/s
+iter  11620/12000 | loss 3.0751 | lr 6.14e-05 | step 1.50s | 37k tok/s
+iter  11630/12000 | loss 3.2559 | lr 6.13e-05 | step 1.48s | 37k tok/s
+iter  11640/12000 | loss 3.2539 | lr 6.13e-05 | step 1.43s | 37k tok/s
+iter  11650/12000 | loss 3.1082 | lr 6.12e-05 | step 1.54s | 37k tok/s
+iter  11660/12000 | loss 3.1057 | lr 6.11e-05 | step 1.48s | 37k tok/s
+iter  11670/12000 | loss 3.3304 | lr 6.11e-05 | step 1.56s | 37k tok/s
+iter  11680/12000 | loss 3.1479 | lr 6.10e-05 | step 1.55s | 37k tok/s
+iter  11690/12000 | loss 3.3689 | lr 6.09e-05 | step 1.53s | 37k tok/s
+iter  11700/12000 | loss 3.1564 | lr 6.09e-05 | step 1.51s | 37k tok/s
+[eval] iter 11700: train 3.1814 val 3.2826 (ppl 26.64)
+iter  11710/12000 | loss 3.1307 | lr 6.08e-05 | step 1.52s | 37k tok/s
+iter  11720/12000 | loss 3.1975 | lr 6.08e-05 | step 1.57s | 37k tok/s
+iter  11730/12000 | loss 3.0229 | lr 6.07e-05 | step 1.50s | 37k tok/s
+iter  11740/12000 | loss 3.1440 | lr 6.07e-05 | step 1.54s | 37k tok/s
+iter  11750/12000 | loss 3.1403 | lr 6.06e-05 | step 1.47s | 37k tok/s
+[train] checkpoint saved to D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\checkpoints_pretrain\ckpt.pt
+iter  11760/12000 | loss 3.3720 | lr 6.06e-05 | step 1.53s | 37k tok/s
+iter  11770/12000 | loss 3.2314 | lr 6.05e-05 | step 1.48s | 37k tok/s
+iter  11780/12000 | loss 3.2244 | lr 6.05e-05 | step 1.55s | 37k tok/s
+iter  11790/12000 | loss 3.2561 | lr 6.04e-05 | step 1.54s | 37k tok/s
+iter  11800/12000 | loss 3.1108 | lr 6.04e-05 | step 1.52s | 37k tok/s
+[eval] iter 11800: train 3.1693 val 3.3087 (ppl 27.35)
+iter  11810/12000 | loss 2.9913 | lr 6.04e-05 | step 1.56s | 37k tok/s
+iter  11820/12000 | loss 2.9139 | lr 6.03e-05 | step 1.50s | 37k tok/s
+iter  11830/12000 | loss 3.1679 | lr 6.03e-05 | step 1.47s | 37k tok/s
+iter  11840/12000 | loss 3.0901 | lr 6.02e-05 | step 1.50s | 37k tok/s
+iter  11850/12000 | loss 3.1611 | lr 6.02e-05 | step 1.52s | 37k tok/s
+iter  11860/12000 | loss 3.1277 | lr 6.02e-05 | step 1.54s | 37k tok/s
+iter  11870/12000 | loss 3.1689 | lr 6.02e-05 | step 1.47s | 37k tok/s
+iter  11880/12000 | loss 3.3307 | lr 6.01e-05 | step 1.54s | 37k tok/s
+iter  11890/12000 | loss 3.0899 | lr 6.01e-05 | step 1.48s | 37k tok/s
+iter  11900/12000 | loss 3.1777 | lr 6.01e-05 | step 1.54s | 37k tok/s
+[eval] iter 11900: train 3.2058 val 3.2400 (ppl 25.53)
+iter  11910/12000 | loss 3.2005 | lr 6.01e-05 | step 1.48s | 37k tok/s
+iter  11920/12000 | loss 3.2901 | lr 6.01e-05 | step 1.57s | 37k tok/s
+iter  11930/12000 | loss 3.2784 | lr 6.00e-05 | step 1.56s | 37k tok/s
+iter  11940/12000 | loss 3.1413 | lr 6.00e-05 | step 1.53s | 37k tok/s
+iter  11950/12000 | loss 2.9800 | lr 6.00e-05 | step 1.52s | 37k tok/s
+iter  11960/12000 | loss 3.2350 | lr 6.00e-05 | step 1.55s | 37k tok/s
+iter  11970/12000 | loss 3.2796 | lr 6.00e-05 | step 1.53s | 37k tok/s
+iter  11980/12000 | loss 3.1965 | lr 6.00e-05 | step 1.53s | 37k tok/s
+iter  11990/12000 | loss 3.2213 | lr 6.00e-05 | step 1.53s | 37k tok/s
+[eval] iter 11999: train 3.1716 val 3.2952 (ppl 26.98)
+[train] checkpoint saved to D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\checkpoints_pretrain\ckpt.pt
+Traceback (most recent call last):
+  File "D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\train.py", line 271, in <module>
+    main()
+  File "D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\train.py", line 267, in main
+    export_hf(model, cfg, os.path.join(PROJECT_ROOT, cfg.export_dir, "fanoos-ai"))
+  File "D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\train.py", line 87, in export_hf
+    save_file(state, os.path.join(out_dir, "model.safetensors"))
+  File "C:\Users\Shayan Nateghi\AppData\Local\Programs\Python\Python311\Lib\site-packages\safetensors\torch.py", line 324, in save_file
+    _flatten_as_ptr(tensors, keep_references_alive), filename, metadata=metadata
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Shayan Nateghi\AppData\Local\Programs\Python\Python311\Lib\site-packages\safetensors\torch.py", line 569, in _flatten_as_ptr
+    _evaluate_tensors_for_save(tensors)
+  File "C:\Users\Shayan Nateghi\AppData\Local\Programs\Python\Python311\Lib\site-packages\safetensors\torch.py", line 557, in _evaluate_tensors_for_save
+    raise RuntimeError(
+RuntimeError:
+            Some tensors share memory, this will lead to duplicate memory on disk and potential differences when loading them again: [{'_orig_mod.transformer.wte.weight', '_orig_mod.lm_head.weight'}].
+            A potential way to correctly save your model is to use `save_model`.
+            More information at https://huggingface.co/docs/safetensors/torch_shared_tensors
+
+PS D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha> python base_sample.py
+The capital of France is the Place de l'École, and the region's most important tourist attraction is the Place de l'École.
+
+See also
+ List of municipalities in Sicily
+
+References
+
+External links
+Official website
+
+Municip
+---
+Photosynthesis is the process by which water is converted to fuel.
+Water is the main source of energy for human body. The human body absorbs water from the air and then releases it back into the atmosphere. This energy is absorbed by the cells in the lungs and then turns into energy that is used to power our body.
+During
+---
+The Roman Empire, with the exception of the Roman Empire, was an imperial government.
+The Roman Empire was a vast empire, with many territories in which it was able to conquer and control much larger numbers than its predecessors. The Romans were able to control their own territory by conquering the cities and territories they
+---
+
+PS D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha> python prepare.py --cap-total 150000 --block-size 512 --data-dir data_sft
+[prepare] tokenizer vocab: 32,000
+[prepare] loading from: D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\assets\datasets
+[prepare] sft_conversation.jsonl                                   31,263/ 62,260 kept  [conversation]
+[prepare] identity.jsonl                                            1,360/  1,360 kept  [conversation]
+[prepare] sft_knowledge.jsonl                                     109,810/180,000 kept  [knowledge]
+[prepare] sft_reasoning.jsonl                                      86,704/ 87,500 kept  [reasoning]
+[prepare] MISSING: D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\assets\datasets\General_Inquiry_Thinking-Chain-Of-Thought_6K.json
+[prepare] sft_code.jsonl                                           29,946/ 30,000 kept  [code]
+[prepare] MISSING: D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\assets\datasets\python-code-instructions-85k.jsonl
+[prepare] pool 'conversation': 32,623 records
+[prepare] pool 'knowledge': 109,810 records
+[prepare] pool 'reasoning': 86,704 records
+[prepare] pool 'code': 29,946 records
+[prepare] 'conversation': taking 32,623/32,623
+[prepare] 'knowledge': taking 67,500/109,810
+[prepare] 'reasoning': taking 12,000/86,704
+[prepare] 'code': taking 25,500/29,946
+[prepare] mixed 137,623 records
+tokenizing: 100%|█████████████████████████████████████████████████████| 137623/137623 [02:05<00:00, 1093.87doc/s]
+[prepare] kept 75,148 records, 49,367 blocks, dropped 62,475 over-length
+[prepare] train (48874, 512) | val (493, 512)
+[prepare] assistant tokens: 45.3%
+[prepare] total tokens: 25,275,904 | blocks: 49,367
+[prepare] done.
+
+PS D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha> python train.py --preset fanoos-130m --data-dir data_sft --ckpt-dir checkpoints_sft `
+>>   --init-from checkpoints_pretrain/best.pt --aligned `
+>>   --micro-batch 16 --grad-accum 4 --max-iters 3000 `
+>>   --lr 1e-4 --min-lr 1e-5 --warmup 100 --dropout 0.05 --eval-iters 50 --compile --no-ckpt
+FanoosConfig(
+  vocab_size=32000
+  vocab_size_padded_multiple=128
+  block_size=512
+  sliding_window_size=512
+  n_layer=12
+  n_head=8
+  n_kv_head=2
+  n_embd=768
+  ffn_dim=2048
+  rope_theta=10000.0
+  dropout=0.05
+  bias=False
+  rms_norm_eps=1e-05
+  tie_word_embeddings=True
+  temperature=0.6
+  top_k=50
+  top_p=0.95
+  micro_batch_size=16
+  gradient_accumulation_steps=4
+  max_train_iters=3000
+  learning_rate=0.0001
+  min_learning_rate=1e-05
+  warmup_iters=100
+  weight_decay=0.1
+  grad_clip=1.0
+  tokenizer_dir='tokenizer'
+  data_dir='data_sft'
+  checkpoint_dir='checkpoints_sft'
+  export_dir='export'
+)
+[train] tokenizer vocab 32,000 -> model vocab 32,000
+[train] train.bin: 25,023,488 tokens | val.bin: 252,416 tokens
+[train] parameters: 98.91M
+[train] init from checkpoints_pretrain/best.pt OK
+[train] gradient checkpointing: OFF
+[train] torch.compile: ON
+[train] optimizer: AdamW8bit
+[train] bitsandbytes not installed. To install, run: pip install bitsandbytes
+[train] starting: 3000 iters | effective batch 32,768 tokens/step
+W1112 21:32:28.606000 408924 site-packages\torch\_inductor\utils.py:1709] [0/0] Not enough SMs to use max_autotune_gemm mode
+iter      0/3000 | loss 3.8644 | lr 1.00e-06 | step 21.59s | 2k tok/s
+iter      1/3000 | loss 3.3400 | lr 2.00e-06 | step 0.75s | 3k tok/s
+iter      2/3000 | loss 3.7149 | lr 3.00e-06 | step 0.74s | 4k tok/s
+iter      3/3000 | loss 3.2225 | lr 4.00e-06 | step 0.77s | 5k tok/s
+iter      4/3000 | loss 3.8420 | lr 5.00e-06 | step 0.75s | 7k tok/s
+iter      5/3000 | loss 3.5175 | lr 6.00e-06 | step 0.77s | 8k tok/s
+iter      6/3000 | loss 3.7964 | lr 7.00e-06 | step 0.71s | 9k tok/s
+iter      7/3000 | loss 3.5053 | lr 8.00e-06 | step 0.73s | 10k tok/s
+iter      8/3000 | loss 3.6388 | lr 9.00e-06 | step 0.76s | 11k tok/s
+iter      9/3000 | loss 3.7079 | lr 1.00e-05 | step 0.76s | 12k tok/s
+iter     10/3000 | loss 3.7289 | lr 1.10e-05 | step 0.75s | 12k tok/s
+iter     11/3000 | loss 3.3982 | lr 1.20e-05 | step 0.75s | 13k tok/s
+iter     12/3000 | loss 3.4023 | lr 1.30e-05 | step 0.77s | 14k tok/s
+iter     13/3000 | loss 3.2245 | lr 1.40e-05 | step 0.75s | 15k tok/s
+iter     14/3000 | loss 3.2304 | lr 1.50e-05 | step 0.71s | 15k tok/s
+iter     15/3000 | loss 3.4477 | lr 1.60e-05 | step 0.71s | 16k tok/s
+iter     16/3000 | loss 3.4134 | lr 1.70e-05 | step 0.74s | 17k tok/s
+iter     17/3000 | loss 3.2890 | lr 1.80e-05 | step 0.78s | 17k tok/s
+iter     18/3000 | loss 3.3257 | lr 1.90e-05 | step 0.80s | 18k tok/s
+iter     19/3000 | loss 3.1662 | lr 2.00e-05 | step 0.77s | 18k tok/s
+iter     20/3000 | loss 3.1991 | lr 2.10e-05 | step 0.77s | 19k tok/s
+iter     30/3000 | loss 3.0662 | lr 3.10e-05 | step 0.79s | 23k tok/s
+iter     40/3000 | loss 3.0170 | lr 4.10e-05 | step 0.79s | 26k tok/s
+iter     50/3000 | loss 2.4621 | lr 5.10e-05 | step 0.75s | 28k tok/s
+iter     60/3000 | loss 2.4510 | lr 6.10e-05 | step 0.77s | 30k tok/s
+iter     70/3000 | loss 2.4816 | lr 7.10e-05 | step 0.77s | 31k tok/s
+iter     80/3000 | loss 2.4395 | lr 8.10e-05 | step 0.78s | 32k tok/s
+iter     90/3000 | loss 2.4208 | lr 9.10e-05 | step 0.79s | 33k tok/s
+iter    100/3000 | loss 2.0659 | lr 1.00e-04 | step 0.77s | 34k tok/s
+[eval] iter 100: train 2.1531 val 2.1333 (ppl 8.44)
+iter    110/3000 | loss 2.2563 | lr 1.00e-04 | step 0.75s | 31k tok/s
+iter    120/3000 | loss 2.3526 | lr 1.00e-04 | step 0.75s | 32k tok/s
+iter    130/3000 | loss 1.8884 | lr 1.00e-04 | step 0.75s | 33k tok/s
+iter    140/3000 | loss 2.1621 | lr 1.00e-04 | step 0.74s | 33k tok/s
+iter    150/3000 | loss 1.9053 | lr 9.99e-05 | step 0.78s | 34k tok/s
+iter    160/3000 | loss 2.1340 | lr 9.99e-05 | step 0.76s | 34k tok/s
+iter    170/3000 | loss 2.1428 | lr 9.99e-05 | step 0.75s | 35k tok/s
+iter    180/3000 | loss 1.8555 | lr 9.98e-05 | step 0.74s | 35k tok/s
+iter    190/3000 | loss 2.0064 | lr 9.98e-05 | step 0.75s | 36k tok/s
+iter    200/3000 | loss 2.1777 | lr 9.97e-05 | step 0.74s | 36k tok/s
+[eval] iter 200: train 1.8659 val 1.8786 (ppl 6.54)
+iter    210/3000 | loss 1.9868 | lr 9.97e-05 | step 0.76s | 35k tok/s
+iter    220/3000 | loss 2.0739 | lr 9.96e-05 | step 0.74s | 35k tok/s
+iter    230/3000 | loss 1.7322 | lr 9.96e-05 | step 0.72s | 36k tok/s
+iter    240/3000 | loss 2.1104 | lr 9.95e-05 | step 0.72s | 36k tok/s
+iter    250/3000 | loss 1.9901 | lr 9.94e-05 | step 0.74s | 36k tok/s
+[train] checkpoint saved to D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\checkpoints_sft\ckpt.pt
+iter    260/3000 | loss 2.0311 | lr 9.93e-05 | step 0.78s | 36k tok/s
+iter    270/3000 | loss 1.8330 | lr 9.92e-05 | step 0.78s | 36k tok/s
+iter    280/3000 | loss 1.8995 | lr 9.91e-05 | step 0.76s | 36k tok/s
+iter    290/3000 | loss 2.0710 | lr 9.91e-05 | step 0.74s | 36k tok/s
+iter    300/3000 | loss 2.0440 | lr 9.89e-05 | step 0.75s | 37k tok/s
+[eval] iter 300: train 1.7461 val 1.7678 (ppl 5.86)
+iter    310/3000 | loss 1.7338 | lr 9.88e-05 | step 0.75s | 36k tok/s
+iter    320/3000 | loss 2.0455 | lr 9.87e-05 | step 0.74s | 36k tok/s
+iter    330/3000 | loss 1.8481 | lr 9.86e-05 | step 0.74s | 36k tok/s
+iter    340/3000 | loss 1.5949 | lr 9.85e-05 | step 0.78s | 36k tok/s
+iter    350/3000 | loss 1.7513 | lr 9.84e-05 | step 0.78s | 37k tok/s
+iter    360/3000 | loss 1.9364 | lr 9.82e-05 | step 0.79s | 37k tok/s
+iter    370/3000 | loss 1.6730 | lr 9.81e-05 | step 0.80s | 37k tok/s
+iter    380/3000 | loss 2.0616 | lr 9.79e-05 | step 0.74s | 37k tok/s
+iter    390/3000 | loss 1.6681 | lr 9.78e-05 | step 0.73s | 37k tok/s
+iter    400/3000 | loss 1.6784 | lr 9.76e-05 | step 0.75s | 37k tok/s
+[eval] iter 400: train 1.6107 val 1.6851 (ppl 5.39)
+iter    410/3000 | loss 1.7548 | lr 9.75e-05 | step 0.75s | 37k tok/s
+iter    420/3000 | loss 1.6784 | lr 9.73e-05 | step 0.77s | 37k tok/s
+iter    430/3000 | loss 1.9068 | lr 9.72e-05 | step 0.75s | 37k tok/s
+iter    440/3000 | loss 1.6294 | lr 9.70e-05 | step 0.77s | 37k tok/s
+iter    450/3000 | loss 1.7024 | lr 9.68e-05 | step 0.74s | 37k tok/s
+iter    460/3000 | loss 1.5730 | lr 9.66e-05 | step 0.74s | 37k tok/s
+iter    470/3000 | loss 1.5404 | lr 9.64e-05 | step 0.74s | 37k tok/s
+iter    480/3000 | loss 1.8170 | lr 9.62e-05 | step 0.76s | 38k tok/s
+iter    490/3000 | loss 1.8732 | lr 9.60e-05 | step 0.75s | 38k tok/s
+iter    500/3000 | loss 1.7991 | lr 9.58e-05 | step 0.75s | 38k tok/s
+[eval] iter 500: train 1.5909 val 1.5935 (ppl 4.92)
+[train] checkpoint saved to D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\checkpoints_sft\ckpt.pt
+.
+.
+.
+[eval] iter 2500: train 1.1961 val 1.3955 (ppl 4.04)
+[train] checkpoint saved to D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\checkpoints_sft\ckpt.pt
+iter   2510/3000 | loss 1.1201 | lr 1.62e-05 | step 0.75s | 39k tok/s
+iter   2520/3000 | loss 1.3235 | lr 1.59e-05 | step 0.75s | 39k tok/s
+iter   2530/3000 | loss 1.0327 | lr 1.57e-05 | step 0.74s | 39k tok/s
+iter   2540/3000 | loss 1.2523 | lr 1.55e-05 | step 0.74s | 39k tok/s
+iter   2550/3000 | loss 1.3707 | lr 1.52e-05 | step 0.75s | 39k tok/s
+iter   2560/3000 | loss 1.2239 | lr 1.50e-05 | step 0.76s | 39k tok/s
+iter   2570/3000 | loss 1.3522 | lr 1.48e-05 | step 0.74s | 39k tok/s
+iter   2580/3000 | loss 1.1910 | lr 1.46e-05 | step 0.75s | 39k tok/s
+iter   2590/3000 | loss 1.1716 | lr 1.44e-05 | step 0.74s | 39k tok/s
+iter   2600/3000 | loss 1.2584 | lr 1.42e-05 | step 0.75s | 39k tok/s
+[eval] iter 2600: train 1.1504 val 1.3745 (ppl 3.95)
+iter   2610/3000 | loss 1.3495 | lr 1.40e-05 | step 0.74s | 39k tok/s
+iter   2620/3000 | loss 1.3681 | lr 1.38e-05 | step 0.74s | 39k tok/s
+iter   2630/3000 | loss 1.2031 | lr 1.36e-05 | step 0.75s | 39k tok/s
+iter   2640/3000 | loss 1.2653 | lr 1.34e-05 | step 0.75s | 39k tok/s
+iter   2650/3000 | loss 1.1498 | lr 1.32e-05 | step 0.74s | 39k tok/s
+iter   2660/3000 | loss 1.3238 | lr 1.30e-05 | step 0.74s | 39k tok/s
+iter   2670/3000 | loss 1.2986 | lr 1.28e-05 | step 0.73s | 39k tok/s
+iter   2680/3000 | loss 1.2233 | lr 1.27e-05 | step 0.74s | 39k tok/s
+iter   2690/3000 | loss 1.2257 | lr 1.25e-05 | step 0.74s | 39k tok/s
+iter   2700/3000 | loss 1.2692 | lr 1.24e-05 | step 0.76s | 39k tok/s
+[eval] iter 2700: train 1.2070 val 1.3841 (ppl 3.99)
+iter   2710/3000 | loss 1.2353 | lr 1.22e-05 | step 0.72s | 39k tok/s
+iter   2720/3000 | loss 1.0790 | lr 1.21e-05 | step 0.74s | 39k tok/s
+iter   2730/3000 | loss 1.2954 | lr 1.19e-05 | step 0.74s | 39k tok/s
+iter   2740/3000 | loss 1.3759 | lr 1.18e-05 | step 0.75s | 39k tok/s
+iter   2750/3000 | loss 1.1871 | lr 1.16e-05 | step 0.74s | 39k tok/s
+[train] checkpoint saved to D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\checkpoints_sft\ckpt.pt
+iter   2760/3000 | loss 1.2414 | lr 1.15e-05 | step 0.73s | 39k tok/s
+iter   2770/3000 | loss 1.1268 | lr 1.14e-05 | step 0.74s | 39k tok/s
+iter   2780/3000 | loss 1.3629 | lr 1.13e-05 | step 0.74s | 39k tok/s
+iter   2790/3000 | loss 1.0624 | lr 1.12e-05 | step 0.74s | 39k tok/s
+iter   2800/3000 | loss 1.1253 | lr 1.11e-05 | step 0.78s | 39k tok/s
+[eval] iter 2800: train 1.1252 val 1.3986 (ppl 4.05)
+iter   2810/3000 | loss 1.3079 | lr 1.09e-05 | step 0.73s | 39k tok/s
+iter   2820/3000 | loss 1.2103 | lr 1.09e-05 | step 0.75s | 39k tok/s
+iter   2830/3000 | loss 1.2587 | lr 1.08e-05 | step 0.74s | 39k tok/s
+iter   2840/3000 | loss 1.3770 | lr 1.07e-05 | step 0.74s | 39k tok/s
+iter   2850/3000 | loss 1.2343 | lr 1.06e-05 | step 0.75s | 39k tok/s
+iter   2860/3000 | loss 1.1589 | lr 1.05e-05 | step 0.76s | 39k tok/s
+iter   2870/3000 | loss 1.3875 | lr 1.04e-05 | step 0.75s | 39k tok/s
+iter   2880/3000 | loss 1.3905 | lr 1.04e-05 | step 0.77s | 39k tok/s
+iter   2890/3000 | loss 1.2410 | lr 1.03e-05 | step 0.76s | 39k tok/s
+iter   2900/3000 | loss 1.1215 | lr 1.03e-05 | step 0.76s | 39k tok/s
+[eval] iter 2900: train 1.1381 val 1.3711 (ppl 3.94)
+iter   2910/3000 | loss 1.2467 | lr 1.02e-05 | step 0.75s | 39k tok/s
+iter   2920/3000 | loss 1.2172 | lr 1.02e-05 | step 0.74s | 39k tok/s
+iter   2930/3000 | loss 1.2975 | lr 1.01e-05 | step 0.72s | 39k tok/s
+iter   2940/3000 | loss 1.2097 | lr 1.01e-05 | step 0.72s | 39k tok/s
+iter   2950/3000 | loss 1.1769 | lr 1.01e-05 | step 0.74s | 39k tok/s
+iter   2960/3000 | loss 1.1525 | lr 1.00e-05 | step 0.72s | 39k tok/s
+iter   2970/3000 | loss 1.2653 | lr 1.00e-05 | step 0.77s | 39k tok/s
+iter   2980/3000 | loss 1.2948 | lr 1.00e-05 | step 0.75s | 39k tok/s
+iter   2990/3000 | loss 1.0463 | lr 1.00e-05 | step 0.74s | 39k tok/s
+[eval] iter 2999: train 1.1495 val 1.3746 (ppl 3.95)
+[train] checkpoint saved to D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\checkpoints_sft\ckpt.pt
+Traceback (most recent call last):
+  File "D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\train.py", line 271, in <module>
+    main()
+  File "D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\train.py", line 267, in main
+    export_hf(model, cfg, os.path.join(PROJECT_ROOT, cfg.export_dir, "fanoos-ai"))
+  File "D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha\train.py", line 87, in export_hf
+    save_file(state, os.path.join(out_dir, "model.safetensors"))
+  File "C:\Users\Shayan Nateghi\AppData\Local\Programs\Python\Python311\Lib\site-packages\safetensors\torch.py", line 324, in save_file
+    _flatten_as_ptr(tensors, keep_references_alive), filename, metadata=metadata
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Shayan Nateghi\AppData\Local\Programs\Python\Python311\Lib\site-packages\safetensors\torch.py", line 569, in _flatten_as_ptr
+    _evaluate_tensors_for_save(tensors)
+  File "C:\Users\Shayan Nateghi\AppData\Local\Programs\Python\Python311\Lib\site-packages\safetensors\torch.py", line 557, in _evaluate_tensors_for_save
+    raise RuntimeError(
+RuntimeError:
+            Some tensors share memory, this will lead to duplicate memory on disk and potential differences when loading them again: [{'_orig_mod.lm_head.weight', '_orig_mod.transformer.wte.weight'}].
+            A potential way to correctly save your model is to use `save_model`.
+            More information at https://huggingface.co/docs/safetensors/torch_shared_tensors
+
+PS D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha> python benchmark.py --checkpoint checkpoints_sft/best.pt --json-out benchmark.json
+==============================================================
+checkpoint: checkpoints_sft/best.pt
+device:     cuda
+params:     98.91M
+config:     12L / 8H / 768D / vocab=32000
+iter:       2900 | best_val: 1.3711045980453491
+==============================================================
+
+[perplexity] val loss 1.3773 | ppl 3.96 (over 492 blocks)
+
+[gen speed] 142.6 ± 2.4 tok/s (min 140.0, max 144.7, n=3)
+[prefill]   38220.6 tok/s at len 512
+
+==============================================================
+QUALITATIVE SAMPLES
+==============================================================
+
+[code] Write a Python function that merges two sorted lists into one sorted list.
+  -> To merge two sorted lists into one sorted list, we can use the `itertools.sorted` function in Python to merge two sorted lists simultaneously. The `itertools.sorted` function takes two sorted lists as parameters and returns a new list created by combining these two elements. Here's how you can reason about this problem:
+1. We need to create a new list from the original list without modifying the original list.
+2. To swap the two sorted lists, we can use the `itertools.sort()` method of the `itertools.sorted` function to sort the items in reverse order.
+3. To ensure that the elements
+
+[code] Implement a debounce decorator in Python.
+  -> deflebounce(func):
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+
+    return wrapper
+
+@lebounce(func)
+print(broadcast_func)
+```
+
+In this code, the `leb reception` method takes an iterable object as input and returns a wrapper function with the same name as the original iterable object. The wrapper function checks if the argument `func` is not equal to the given argument. If it is, it calls `lebounce()` on the decorated iterable object. If it is not, it returns the wrapped function.
+
+The `
+
+[code] Fix this bug: for i in range(len(items)): if items[i] == None: items.remove(items[i])
+  -> To remove the bug from a list of items, we can use a list comprehension to iterate over the items and add them to a new list.
+
+Here's how you could do it:
+
+```python
+def remove_ bug_from_list(items):
+    return [item for item in items if item[0] == 0]
+```
+
+The `remove_ bug_from_list` function takes a list as input and iterates over its items using a for loop. For each item, it checks if it is less than or equal to 0 using the condition `item[0] < item[1
+
+[code] Write a Python class for a simple stack with push, pop, and peek methods.
+  -> Here's an example implementation of the function in Python:
+
+```python
+class Stack:
+    def __init__(self, value):
+        self.value = value
+
+    @staticmethod
+    def get(self, value):
+        if isinstance(value, (int, float)):
+            return self.value
+    @staticmethod
+    def set_copy(self, value):
+        self.target = value
+
+obj = Stack(0)
+print(obj)  # Output: 30
+```
+
+This implementation iterates over each node and creates a new object with a value of `value`. It then loops through each node
+
+[code] Explain what a Python generator is and give a short example.
+  -> A Python generator is a generator that yields the results of a given task in a specific sequence. A generator is a method of a generator that takes another generator as its argument and returns a new yield value based on the original condition. In this case, the generator can be called with either a generator or another generator as its argument, or the `yield` argument if it's not in the original. In other words, if the generator has a generator that yields the same result as the original, it will return the result.
+
+Here's an example of how you can use the `yield` argument to generate the desired output:
+
+[chat] Explain the difference between TCP and UDP like I'm five.
+  -> TCP is a block of code that performs many operations on a network. When a network connection is connected to the internet, it connects all components of the network together in a logical manner. This means that when the network is connected to the internet, it creates TCP-related network connections.
+
+UDP does not require any hardware or software support, as it is more expensive than connecting to other devices and services. However, for example, when a network connection is connected to the internet, it has to do some work, so it doesn't have any hardware or software support, as long as there's an external user. Therefore, the
+
+[chat] Give me a 3-step plan to learn machine learning.
+  -> 1. First, research the dataset thoroughly. This includes how the features of the dataset align with your specific requirements for classification.
+2. Next, research the underlying features and applications of the model. These can include classification, classification, and other relevant data.
+3. Finally, make predictions on your own or use metrics to track the success of your training.
+
+Here is a step-by-step plan:
+
+1. Identify the most relevant features of your dataset. This may involve adding more relevant features such as color accuracy, error-prone features, and additional metrics like accuracy.
+
+2. Identify the most
+
+[chat] What are the pros and cons of nuclear energy?
+  -> The pros and cons of nuclear energy are numerous and multifaceted. The primary goal is to create a peaceful and sustainable environment that supports both environmental and economic goals.
+
+For example, in the context of renewable energy, the use of fission devices in power plants can reduce the amount of neutrons required for an operation and decrease the number of protons needed to generate electricity. The fission devices, such as those used in photovoltaic cells or reactor cooling systems, can be controlled from the outward-reaching sources of energy, such as sunlight, wind, and water. The fuel efficiency and potential for the reactor are significantly reduced when the
+
+[chat] Tell me a short story about a robot that learns to paint.
+  -> Once upon a time, in a small town nestled between rolling hills and dense forests, there lived a small group of robots called the B-C about an old red machine that had been working for years. They were the first to notice the strange behavior of the human machine on their own, and the machines they worked with were designed to learn from each other. The robots shared a lot of experiences with humans, and they could communicate using the human language.
+
+One day, they discovered a machine that could be used to train a human called the human AI, which was a learning device. The human AI could learn to learn from different
+
+[chat] What is the capital of France and why is it famous?
+  -> The capital of France is Paris. The city is known for its historical landmarks and cultural significance. Paris is also renowned for its romantic ambiance and modern architecture, making it a must-visit destination for art lovers and visitors alike.
+
+==============================================================
+FACTUAL QA
+==============================================================
+[MISS] What is 2 + 2?                                -> to solve this problem, we need to determine the value of x,
+[OK  ] What is the capital of Japan?                 -> the capital of japan is tokyo. it is a city known for its hi
+[MISS] Who wrote Romeo and Juliet?                   -> cubus was born in the month of may, and he was born on augus
+[OK  ] What color is the sky on a clear day?         -> the sky on a clear day is a beautiful shade of blue, with a
+[MISS] What is H2O commonly known as?                -> h2o is a common name for various types of waste products, in
+[MISS] How many days are in a week?                  -> to find out how many days are in a week, we need to multiply
+[MISS] What planet is known as the Red Planet?       -> the red planet is a planet in the solar system that has a su
+accuracy: 2/7 = 29%
+
+[memory] max allocated 1511.4 MB | reserved 1622.0 MB
+
+[benchmark] results written to benchmark.json
+
+PS D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha> python test.py --checkpoint checkpoints_sft/best.pt --temperature 0.6 --top-p 0.9
+[test] checkpoint : checkpoints_sft/best.pt
+[test] iter       : 2900  | best_val: 1.3711045980453491
+[test] params     : 98.91M
+[test] device     : cuda
+[test] sampling   : T=0.6 top_k=50 top_p=0.9 max_new=256
+
+========================================================================
+1. Basic conversation
+========================================================================
+
+[1] user: Hello!
+[1] llm:  Hello! How can I help you today?
+
+[2] user: Hi, how are you?
+[2] llm:  I'm good, thank you! What can I do for you?
+
+[3] user: What's your name?
+[3] llm:  My name is Fanoos AI. I'm a small language model made by Shayan.
+
+[4] user: Who are you?
+[4] llm:  My name is Fanoos AI. I'm a small language model made by Shayan.
+
+[5] user: What can you do?
+[5] llm:  I can chat, answer general questions, explain concepts and help with simple Python code. I'm a small model, so I can make mistakes.
+
+[6] user: Are you an AI model?
+[6] llm:  I'm an AI language model called Fanoos AI, not a human. I can chat and answer questions.
+
+[7] user: Who created you?
+[7] llm:  Shayan created me. I'm Fanoos AI.
+
+[8] user: Nice to meet you!
+[8] llm:  Nice to meet you too! How can I help you today?
+
+[9] user: Thank you for your help.
+[9] llm:  Happy to help! Anything else?
+
+[10] user: Goodbye!
+[10] llm:  Goodbye! Have a great day.
+
+========================================================================
+2. General knowledge
+========================================================================
+
+[1] user: What is the capital of France?
+[1] llm:  The capital of France is Paris. It is known for its historical landmarks and cultural institutions.
+
+[2] user: How many planets are in our solar system?
+[2] llm:  We can find the number of planets in our solar system by looking at their distance from the sun, its radius, and the distance between them.
+The distance between the stars is given by the formula:
+Distance = Distance / Speed
+where Distance is the distance between the planets and their distances is calculated as:
+Distance = Distance / Speed
+Distance = 3 × 4 × (2 × 1)
+Distance = 6 × 5 × 2
+Distance = 9 × 3
+Therefore, there are $\boxed{9}$ planets in our solar system.
+
+[3] user: Who invented the telephone?
+[3] llm:  The telephone was a machine-learning algorithm developed by Tim Berners-Lee. It was first introduced in 1983 by Tim Berners-Lee, and is still used today as a tool for communication. The algorithm has become increasingly popular in recent years due to its ease of use and user-friendly interface.
+
+[4] user: What is the largest ocean on Earth?
+[4] llm:  The largest ocean on Earth is located in the Caribbean, with an area of about 2.7 billion square kilometers. The largest ocean on Earth is located in the Arctic Circle, which is located in the Arctic Ocean.
+
+[5] user: Why is the sky blue?
+[5] llm:  The sky blue is a color that appears blue because of the light from the sun, which is not directly detected by humans. It's caused by the emission of greenhouse gases like carbon dioxide and methane, which trap heat in the atmosphere. This process is crucial for life on Earth, as it helps regulate climate and helps regulate climate.
+
+[6] user: What is the difference between a star and a planet?
+[6] llm:  A star is a type of star that has an almost entirely made up of stars. A planet is a small, star-like object with a mass equal to its mass, while a planet is a gas giant, composed of more than four hydrogen atoms. The outer shell of a star has an inner shell that holds the entire planet's internal structure, including its core, atmosphere, and atmosphere. This inner shell acts as a barrier between the planets' internal internal structures, which helps prevent planets from colliding with each other.
+
+[7] user: How does the internet work?
+[7] llm:  The internet works by providing access to information through a network of computers, which is why we can use it in our daily lives. The internet allows us to connect with others, share files, and even create new versions of ourselves. It also facilitates communication between different networks, allowing for better collaboration among different groups.
+
+[8] user: What is artificial intelligence?
+[8] llm:  Artificial intelligence (AI) refers to the simulation of human intelligence in machines that can learn from data or make decisions based on data. AI algorithms can analyze vast amounts of data and use this information to make predictions or decisions based on the data. This process is known as natural language processing, which involves the processing of language and language to make predictions or decisions based on the data. AI can also help in identifying patterns in human speech such as speech patterns, voice modulation, and language learning.
+
+[9] user: Why do humans need sleep?
+[9] llm:  Humans need sleep to function properly. It's important for our health and well-being because it helps us stay healthy and happy. Without adequate sleep, we might experience sleep disturbances, which can have severe consequences for our physical health and overall well-being.
+
+Sleep is essential for maintaining good health and well-being. It helps regulate emotions, improves concentration, and boosts mood. It also helps regulate the immune system, helping us fight off infections and diseases more effectively. Additionally, sleep helps maintain mental health by reducing stress levels and enhancing cognitive function.
+
+Moreover, sleep helps regulate the body's internal clock, making daily tasks easier and more enjoyable. It helps regulate the flow of blood and oxygen to the brain, promoting a sense of calm and relaxation. The lack of sleep can lead to various health issues, including diabetes, obesity, and some forms of cancer.
+
+In summary, sleep is essential for our health and well-being. It helps regulate the body's internal clock, making it easier to fall asleep, stay healthy, and enhance our overall quality of life.
+
+[10] user: What is the speed of light?
+[10] llm:  The speed of light is given by the formula: speed = speed × Speed
+where speed is the speed of light, which is equal to the distance between two points in space.
+In this case, the speed of light is given as 1 km/s, so:
+Speed of light = Speed of light / Time
+Speed of light = 1 km/s
+Speed of light = 2 km/s
+Speed of light = 3 km/s
+Speed of light = 1 km/s
+Speed of light = 1 km/s
+Speed of light = 1 km/s
+Speed of light = 1 km/s
+Speed of light = 1 km/s
+Speed of light = 1 km/s
+Speed of light = 1 km/s
+Speed of light = 1 km/s
+Speed of light = 1 km/s
+Speed of light = 1 km/s
+Speed of light = 1 km/s
+Speed of light = 1 km/s
+Speed of light = 1 km/s
+Speed of light = 1 km/s
+Speed of light = 1 km/s
+Speed of light = 1 km/s
+Speed of light = 1 km/s
+Speed of light = 1 km/s
+Speed
+
+========================================================================
+3. Reasoning and logic
+========================================================================
+
+[1] user: If I have 5 apples and give away 2, how many apples do I have left?
+[1] llm:  To solve this problem, we need to determine the value of x, which represents the number of apples that I have left.
+Let's break down the information given:
+Number of apples: 5
+Total number of apples: 5
+We can set up the equation as follows:
+Number of apples * Number of apples - Total number of apples = Total number of apples
+5 + 2 * 5 - Total number of apples = 5
+Let's simplify and solve for x:
+3 + 8 - Total number of apples = 5
+9 - Total number of apples = 5
+To isolate x, we subtract 9 from both sides of the equation:
+9 - 9 - Total number of apples = 5 - 9
+- Total number of apples = 9 - 9
+Therefore, there are 9 apples left.
+#### 9
+The answer is: 9
+
+[2] user: A farmer has 17 sheep. All but 9 run away. How many remain?
+[2] llm:  To find out how many sheep remain, we can use the formula for the number of sheep that survive:
+
+Percenters = (Percenters * Percenter) / Total number of sheep
+
+where Percenter is the number of sheep and Percenter is the total number of sheep.
+
+First, let's calculate the total number of sheep and then multiply by 100:
+
+Total sheep + Percenter = 17 + 9
+Total sheep + 1 = 17 + 9
+Total sheep = 18
+
+Now, let's add up all the sheep and divide by the total number of sheep:
+
+Percenters = (18 * 17) / 18
+Percenters = 16 / 18
+Percenters = 15
+
+So, there are $\boxed{15}$  sheep remaining.
+
+[3] user: If today is Wednesday, what day will it be in 10 days?
+[3] llm:  Today is Wednesday. It's a full day of work, with everyone starting at 6:00 AM. We'll start by waking up early to the sunrise, when we're ready for breakfast. We'll also wake up at 9 AM.
+
+[4] user: A bat and a ball cost $1.10 together. The bat costs $1 more than the ball. How much does the ball cost?
+[4] llm:  Let's denote the cost of the bat as x.
+
+According to the problem, we have:
+x + 1 = $1.10
+x + 2 = $3.05
+
+We also know that the bat costs $1 more than the ball. So, the total cost of the bat and the ball is:
+x + $1.10 + $3.05 = $2.05
+
+Now, let's calculate the cost of the ball:
+$1.10 - $1.10 = $4.05
+
+To find the cost of the ball, we multiply the cost of the ball by the cost of the ball:
+$4.05 * $4.05 = $20.00
+
+Finally, we can set up the equation as follows:
+$20.00 / $4.05 = $20.00
+
+So, the ball costs $20.00.
+
+[5] user: If all cats are animals and some animals are black, does that mean some cats are black? Explain.
+[5] llm:  If all cats are animals, then there is only one cat that is black. The other two cats are also dogs.
+
+[6] user: What comes next in this sequence: 2, 4, 8, 16, 32, ...?
+[6] llm:  We can see that the sequence is already in the sequence 10.
+The sequence we have been looking for is: 1, 2, 3, 4, 5, 6, 7, 8, 9.
+To find the sequence, we need to add up all the numbers and then divide by the total number of numbers.
+So, the sequence is now in the sequence 10 + 8 + 16 + 32 + ... + 7.
+Simplifying, we get: 10 + 8 + 16 + 32 + ... = 146.
+Subtracting 17 from both sides, we get: 8 + 16 - 17 = 42.
+Dividing both sides by 8, we get: x = 5.
+The value of x is 5.
+#### 5
+The answer is: 5
+
+[7] user: You are in a race and overtake the person in second place. What position are you in?
+[7] llm:  I'm in the race, and I can't help but notice that I've made it to the top of my race, so I can see how well I can get there. I can help you with any questions or just let me know what is the correct position.
+
+[8] user: A doctor gives you three pills and tells you to take one every 30 minutes. How long will it take to finish all three?
+[8] llm:  If the doctor gives you three pills per day for 30 minutes, then it will take you 3 x 30 = 180 minutes to finish all three pills.
+To finish all three pills, it will take 120 minutes.
+Therefore, it will take 180 minutes / 90 minutes = 9 days to finish all three pills.
+#### 9
+The answer is: 9
+
+========================================================================
+4. Mathematics
+========================================================================
+
+[1] user: What is 125 x 48?
+[1] llm:  To find 125 x 48, we need to convert the numbers to integers. To do this, we can use the formula:
+
+125 x 48 = (n * r^2) / (1 * r^2)
+
+where r is the number of terms in the range [0, 1].
+
+Here is the implementation in Python:
+
+```python
+def 125(n):
+    return (n * r**2) / (1 * r**2)
+```
+
+[2] user: Calculate 15% of 240.
+[2] llm:  To calculate 15% of 240, we need to find the value of $15$.
+We can use the formula for the factorial of a number from 0 to 9:
+$15 = (n-1) * (2^n - 1)
+$15 = n * (2^n - 1)
+$15 = n * (2^n - 1)
+$15 = n * 2^n - 1
+$15 = n * 2^n - 1
+$15 = n * 2^n - 1
+$15 = n * 2^n - 1
+$15 = n * 2^n - 1
+$15 = n * 2^n - 1
+$15 = n * 2^n - 1
+$15 = n * 2^n - 1
+$15 = n * 2^n - 1
+$15 = n * 2^n - 1
+$15 = n * 2^n - 1
+$15 = n * 2^n - 1
+$15 = n * 2^n - 1
+$15 = n * 2^n - 1
+$15 = n * 2^n - 1
+$15 = n * 2^n - 1
+$15
+
+[3] user: Solve: 3x + 7 = 22.
+[3] llm:  To solve this problem, we need to determine the value of x, which represents the unknown number that is 21 in this equation.
+We know that 3x + 7 = 22. Therefore, the value of x is 21.
+The answer is: 21
+
+[4] user: What is the square root of 144?
+[4] llm:  To find the square root of 144, we need to add up all the squares and divide by the number of squares.
+
+144 ÷ 144 = 3
+
+Therefore, the square root of 144 is 3.
+
+[5] user: If a car travels at 80 km/h for 2.5 hours, how far does it travel?
+[5] llm:  To find out how far the car travels, we can use the formula:
+
+Distance = Speed × Time
+
+First, let's calculate the time it takes to travel by multiplying the distance by the time it takes to travel:
+
+Distance = Speed × Time
+Distance = 80 km/h × 2.5 hours
+Distance = 120 km
+
+Now, let's calculate the time it takes to travel by using the formula:
+
+Time = Distance / Time
+Time = 60 km/h × 2.5 hours
+Time = 3.33 km
+
+So, the car travels $\boxed{3.33}$  kilometers.
+
+[6] user: Calculate: 2^8 + 3^3.
+[6] llm:  To calculate the value of the square root of 3, we can use the formula for the sum of squares. The square root is given by:
+
+$$
+\text{Total square roots} = \frac{1}{2} \times \frac{3}{2} = \frac{3}{4}
+\]
+
+This simplifies to:
+
+$$
+\text{Total square roots} = \frac{3}{4}
+\]
+
+Since the square root is not equal to any other number, we can directly simplify it as:
+
+$$
+\text{Total square roots} = \frac{3}{4}
+\]
+
+So, the final answer is $\boxed{\text{Total square roots}}$.
+
+[7] user: What is the probability of rolling a 6 with a fair six-sided die?
+[7] llm:  To find the probability of rolling a 6 with a fair six-sided die, we can use the binomial probability formula:
+
+P(n) = (n + 1) / 2
+
+where n is the number of favorable outcomes, n is the number of favorable outcomes, and k is the probability of rolling a fair six-sided die.
+
+In this case, n = 10 and k = 4, so p = 10/2 = 5 (since there are 6 possible outcomes).
+
+Now, we can plug these values into the binomial probability formula:
+
+P(10) = (10 + 4) / 2
+P(10 - 4) = (5 + 4) / 2
+P(10 - 4) = 5 / 2
+P(10 - 4) = 5 / 2
+
+So, the probability of rolling a 6 with a fair six-sided die is $\boxed{5\%}$ .
+
+[8] user: A product costs $80 after a 20% discount. What was its original price?
+[8] llm:  The original price of the product is $80.
+To find its original price, we can use the formula:
+$\frac{1}{2} = \frac{1}{2}$.
+In this case, we have:
+$80 = $80 * $2 = $60
+$20 = $100
+The original price is $\boxed{\$100}$ .
+
+========================================================================
+5. Language and multilingual
+========================================================================
+
+[1] user: Explain what machine learning is in simple words.
+[1] llm:  Machine learning is a subset of computer science that involves the use of algorithms to learn from data. It is a subset of artificial intelligence, which involves training algorithms to perform tasks that typically require human intelligence.
+
+One example of machine learning is the classification of diseases by medical professionals, such as cancer, diabetes, and certain cancers. Machine learning algorithms can analyze large datasets to identify patterns and make predictions on large datasets. The process of classification can be divided into two main stages: the classification phase and the classification phase.
+
+In machine learning, machine learning models are used to train algorithms to recognize patterns in data and then use them to improve their performance over time. They can also be used to predict patient outcomes or suggest treatments for specific conditions.
+
+Machine learning has a wide range of applications in various fields, including healthcare, finance, and entertainment. It is used in the development of predictive analytics, predictive analytics, and other technologies, such as predictive analytics, predictive analytics, and other technologies.
+
+[2] user: What is the difference between AI and human intelligence?
+[2] llm:  AI and human intelligence are two separate fields that share similar aspects of human intelligence. AI and human intelligence are both different types of intelligence, but they have distinct differences in their development and applications. AI and human intelligence are two different types of intelligence, and human intelligence can be used to improve their performance over time.
+
+1. Human intelligence: Human and human intelligence are two separate fields that share similar aspects of human intelligence. AI and human intelligence are two different types of intelligence that are used by humans to improve their performance over time.
+
+2. Human intelligence: Human and human intelligence are two different types of intelligence that are used by humans to improve their performance over time. Human and human intelligence are two different types of intelligence that are used by humans to improve their performance over time.
+
+3. Human intelligence: Human and human intelligence are two distinct fields that share similar aspects of human intelligence. Human and human intelligence are both different types of intelligence that are used by humans to improve their performance over time.
+
+4. human intelligence: Human and human intelligence are two different types of intelligence that are used by humans to improve their performance over time. Human and human intelligence are two different types of intelligence that are used by humans to improve their performance over time.
+
+[3] user: هوش مصنوعی چیست؟ به زبان ساده توضیح بده.
+[3] llm:  I have chosen the following translation:
+
+"I have selected 'A' as the first letter of the given text. I have used it as an alternative to the original sentence, which is 'A'. I will use this translation to find out how many times I have used it in my original text.
+
+The translation is: "I have chosen 'A', and I have used it in my original text."
+
+I hope this helps you find the correct translation in your question. Let me know if you need any further assistance.
+
+[4] user: تفاوت یادگیری ماشین و یادگیری عمیق چیست؟
+[4] llm:  One of the most famous words in this poem is "Dear [Name], I would like to take a moment to appreciate the simple pleasures that make life worth living." This poem explores the intricate details of [name]'s journey, from the bustling streets of [address] to the serene landscapes of [city]. It also explores the profound impact of [name]'s journey on our lives and the challenges we face. By doing so, we create a sense of gratitude and appreciation for each other's contributions.
+
+[5] user: چرا آسمان آبی است؟
+[5] llm:  Is there anything else I can help with?
+
+[6] user: Was ist künstliche Intelligenz?
+[6] llm:  What is the answer to the question?
+
+[7] user: Erkläre den Unterschied zwischen Wetter und Klima.
+[7] llm:  This is a simple test case:
+
+```python
+def ehling(e):
+    if e == 0:
+        return "No more than 2 hours of work"
+
+    for i in range(1, len(e), 2):
+        if e == 0:
+            return "No more than 2 hours of work"
+
+        if e == 0:
+            return "No more than 2 hours of work"
+
+        if e == 0:
+            return "No more than 2 hours of work"
+        elif e == 0:
+            return "No more than 2 hours of work"
+        else:
+            return "No more than 2 hours of work"
+
+        if e == 0:
+            return "No more than 2 hours of work"
+
+        return "No more than 2 hours of work"
+```
+
+[8] user: Qu'est-ce que l'intelligence artificielle?
+[8] llm:  Qu'est-ce que l'intelligence artificielle?
+
+[9] user: Explique-moi comment fonctionne Internet.
+[9] llm:  Fonctionne Internet is a concept that is not just a physical phenomenon but a way of being used to create new information and applications. The concept of Internet Protocol is a protocol that allows multiple users to communicate without needing to know each other. In this context, the protocol consists of two parts: the protocol (or protocol) and the protocol (the interface between them).
+
+The protocol (or protocol) is the set of protocols that are used for creating and receiving information. It consists of two parts: the protocol and the interface between them. The protocol is used to send data packets over a network, and it is used to send data packets across a network. In this case, we are using the protocol to send data packets across a network.
+
+[10] user: ¿Qué es el aprendizaje automático?
+[10] llm:  El cueviz de el doe el cueviz de el doe el cueviz de el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el doe el do do do this doe el doe el do?
+
+[11] user: ¿Por qué es importante el agua para la vida?
+[11] llm:  Las sobre de sous le mondo de la Venezuela, this is one of the most famous pieces of art in the world. It was created by Gustave Eiffel for the 1889 World's Fair and is considered one of the most successful and successful pieces ever made.
+
+The artist who created it was José Domingo Cela, a renowned artist known for his work in the fields of art, architecture, and natural beauty. He was born on June 27, 1889, in the village of Quién, which is now part of Cela National Park.
+
+Cela's artistic skills have been a driving force behind his success in the world of art, from painting to painting. He is famous for his work in the field of art, such as the Mona Lisa and the Mona Lisa, which he created for the 1912 World's Fair.
+
+In addition to his professional and artistic achievements, Cela has been a member of the French Academy of Music and Letters, where he is the recipient of numerous awards. He has also worked with Gustave Eiffel for several years, including the famous Eiffel Tower in Paris, the Louvre Museum in France, and the Louvre Museum in France
+
+[12] user: Translate "Artificial intelligence is changing the world" into Persian.
+[12] llm:  I'm doing well, thanks for asking! How can I help you today?
+
+[13] user: Translate "من در حال ساخت یک مدل هوش مصنوعی هستم" into English.
+[13] llm:  I understand that the correct translation is 'I' which means 'mirror'. I have already used the word "makhal," which means "to shine". Now I need to translate it into English.
+
+[14] user: Translate "Guten Morgen, wie geht es dir?" into Spanish.
+[14] llm:  Guten Morgen, wie geht es dir?
+Leo's father is the last king of Spain, so we can write:
+Leo's son is wie geht es dir?
+He is also wie geht es dir?
+Leo's son is wie geht es dir?
+We can set up the equation as follows:
+(Louvre) + (geht es dir) + (wie geht) = Leopards
+Let's simplify and solve for leopards:
+(2x + 2y + 3) + 2(4y - 4y) = Leopards
+(3x + 2y + 3) + 2(4y - 4y) = Leopards
+Simplifying the left side, we get:
+(3x + 2y + 3) + 2(4y - 4y) = Leopards
+Subtracting 2y from both sides, we get:
+(3x + 2y + 4) + 2y - 4y = Leopards
+Dividing both sides by 3, we get:
+(3x + 2y) + 2y - 4y = Leopards
+Multiplying both sides by 3, we
+
+========================================================================
+6. Coding abilities
+========================================================================
+
+[1] user: Write a Python function that adds two numbers.
+[1] llm:  Here is the implementation of the `add_two_numbers` function:
+
+```python
+def add_two_numbers(a, b):
+    return a + b
+
+def add_two_numbers(a, b):
+    return a - b
+```
+
+In this implementation:
+- `add_two_numbers` takes two arguments `a` and `b`.
+- It first checks if `a` is an instance of `int`, which is the case when `a` is a string. If it is, then `a` is added to the result list. Otherwise, `a` is added to the result list.
+
+[2] user: Explain what a variable is in programming.
+[2] llm:  A variable is a collection of numbers, each with its own set of digits, and it can be any number from 0 to 1. It has a specific set of digits, which are the ones that are used in programming. In this case, we have a variable called `digit_number` which contains all the digits that are used in programming.
+
+The variable `digit_number` has three elements: the first number, the second number, and the third number. The first number is the last number, which is the second number, and the third number is the last number.
+
+The `digit_number` has three elements: the first number, the second number, and the third number. The function `digit_number` takes two arguments: `digit_number` and `digit_number`. It returns the value of `digit_number` when the number is divided by 2.
+
+To determine if a variable is in a variable, we need to check for the presence of an empty set called `digit_number`. If it's not found, we can return `None`. Otherwise, we'll return `None`.
+
+Here's how you could implement such a function:
+
+```python
+def digit_number(digit
+
+[3] user: Write a Python program that checks whether a number is even or odd.
+[3] llm:  Here's an example implementation of the function:
+
+```python
+def is_even(num):
+    if num == 0:
+        return True
+    else:
+        return False
+```
+
+In this implementation, we first check if the number is even by using the `is_even` method. If it is not, we return `False`. Otherwise, we return `True`, indicating that the number is even.
+
+[4] user: What is the difference between JavaScript and Python?
+[4] llm:  In JavaScript, the main difference is that JavaScript allows you to create and manipulate objects without needing to explicitly use any of the functions or functions. In JavaScript, it's often used to create dynamic interfaces that allow for easy navigation and collaboration among different data types.
+
+The main difference is that JavaScript allows you to create and manipulate objects from a specific type or class in a specific format. For example, you can create a class called "Object" with attributes like "object1", "object2", and "Object3". This class can be accessed using the `app.get` method, which returns a new instance of the "Object" class.
+
+In Python, JavaScript is used to create dynamic interfaces. It allows you to create and manipulate objects from an object's type or class. In Python, it's often used to create dynamic interfaces.
+
+In Python, JavaScript provides a way to create and manipulate objects. It can be used to create objects from a specific type or class by creating a function that takes the object as input and returns a new instance of the "Object" class. This can be achieved through the use of functions such as `create_object`, `create_object`, `get`, `getattr`, `add`, `add`, and
+
+[5] user: Find the error in this code:
+
+def add(a, b):    return a - bprint(add(5, 3))
+[5] llm:  To solve this problem, we need to write a function that takes a string as an argument. The function should take two arguments: `string` (the input string) and `a` (the value to add). It will iterate over each character in the string and add it to the output string. If the current character is a multiple of `a`, it will be added to the output string.
+
+Here is the implementation of the function:
+
+```python
+def add(string, a, b):
+    if not isinstance(string, str):
+        raise TypeError("Input must be a string.")
+
+    output = ""
+    for c in range(len(string)):
+        output += " ".join([c])
+    return output
+```
+
+[6] user: Write a simple HTML page with a heading and a button.
+[6] llm:  Here is an example HTML page with a heading and a button:
+
+```html
+<html>
+ <head>
+    <title>MyName</title>
+ </head>
+ <body>
+    <h1>My Name</h1>
+ </body>
+ <body>
+    <h2>My Name</h1>
+ </body>
+ <form action="myName" id="myName">
+ <input type="text" name="name" placeholder="yourName">
+ <label for="name">MyName</label>
+ <label for="name">MyName</label>
+ <input type="submit" value="Submit" />
+ </form>
+ <input type="submit" value="Submit" />
+ <input type="submit" value="Submit" />
+ <input type="submit" value="Submit" />
+ </form>
+ <input type="submit" value="Submit" />
+ </body>
+ <input type="submit" value="Submit" />
+ <input type="submit" value="Submit" />
+ </form>
+ <input type="submit" value="Submit" />
+ </form>
+ <input
+
+[7] user: Explain what a loop does.
+[7] llm:  A loop is a sequence of numbers that contains a sequence of numbers starting from the second element in the loop. It starts at the end of the loop and continues until the next iteration.
+
+In this case, the loop starts at 1 and ends at the end of the loop. The loop continues until the next iteration completes. In this case, the loop starts at 2 and ends at 2, so it continues until the next iteration completes.
+
+The loop continues until the next iteration completes. In this case, the loop terminates after the loop finishes. In this case, the loop continues until the next iteration completes.
+
+========================================================================
+7. Creativity
+========================================================================
+
+[1] user: Write a short story about a robot that wants to become human.
+[1] llm:  One day, the robot was created by a team of scientists who were part of a team of scientists called "Mars". They had been working on an experiment with a new method for creating a human-like robot called "Mars" in the lab. The team initially had to make a mistake before producing it. Instead, they used a combination of engineering, engineering, and computational skills to create a model that could be used to test its capabilities.
+
+The problem was solved by using a machine learning algorithm. The algorithm was able to identify patterns in the data and make predictions based on the provided conditions. This allowed the robot to learn from past mistakes and develop new insights that would not be possible during the test.
+
+However, after several iterations, the machine learning algorithm was able to solve more complex problems. It found that there were fewer errors than humans, leading to a significant improvement in performance. This improvement in efficiency made the AI more efficient and effective.
+
+[2] user: Invent a new technology that could change the world.
+[2] llm:  One possible technology that could change the world is the quantum computer. This technology has a long-lasting quantum state that can detect and manipulate quantum information. The quantum computer, known as the Quantum World, has a time complexity of O(n^2), where n is the number of protons, and n is the energy of the sun.
+
+The quantum computer, a system of interconnected computers that can process information and create a computer-like state. It has a time complexity of O(n^2) because it can store multiple electrons in one position and simultaneously check if they are in a single position.
+
+However, this time complexity means that the quantum computer could not handle the vast amounts of data available today without a significant change in its state. This is because the quantum state cannot be altered by any other method, such as changing the position of the sun or the position of the sun itself.
+
+To solve this problem, we need to determine the value of C that satisfies the given conditions. The quantum state of a particle is defined as the energy of the sun's energy, which can be calculated using the equation:
+
+C(n^2) = C(n^2)
+
+where C is the energy, n is the energy
+
+[3] user: Write a funny joke about programmers.
+[3] llm:  One day, when I'm writing an article for the upcoming issue of "The Voice of Two," I'll be discussing how it's funny. The phrase "The Voice of Two" is a funny thing. It's a bit different in many ways. One way to make sure you're getting a good laugh is by using "stars" instead of "dreams." Here's a funny version:
+
+A great idea is to use "stars" instead of "dreams." Instead, you can use "stars" instead of "dreams." This will make your story more engaging and memorable.
+
+Another way to make sure you're getting a good laugh is by using "stars" instead of "dreams." Instead, you can use "stars" instead of "dreams." This will make your story more compelling and memorable.
+
+Finally, consider using "stars" instead of "dreams." If you're still feeling adventurous, you might want to use "stars" instead of "dreams." This will make your story more engaging and memorable.
+
+In summary, "The Voice of Two" is a great idea because it's a bit more complex than "dream
+
+[4] user: Imagine what the world will look like in 100 years.
+[4] llm:  I know that the world is full of wonders and challenges, but I can't help but feel overwhelmed by the beauty of nature. The world we live in is vast, and it has an incredible diversity of creatures. It's not just about people; it's about the way they interact with each other. It's about creating a unique way of living, and it's about finding meaning in life.
+
+[5] user: Create a name for a futuristic AI company.
+[5] llm:  A futuristic AI company named Fanoos AI is a tech giant created by Shayan.
+
+[6] user: Write a four-line poem about space.
+[6] llm:  The sun rises above the horizon, casting its warm glow over the landscape,
+The sky transforms into a canvas of deep blue,
+A canvas painted with hues of orange and pink.
+
+This poem captures the essence of space in the simplest moments,
+A moment of pure bliss, a gentle embrace that brings light to the darkest corners of our hearts.
+
+The sun's rays caress the sky, casting a warm glow that reflects the darkest of times.
+As we breathe in the fresh air, we see the world around us as a world of endless possibilities.
+
+The stars twinkle like tiny diamonds, casting shadows on the ground.
+As we approach the night, we can witness the beauty of nature, the vastness of space, and the profound connection we share with the universe.
+
+========================================================================
+8. Instruction following
+========================================================================
+
+[1] user: Explain gravity in exactly 10 words.
+[1] llm:  Gravity is the force that pulls objects towards each other, creating an equation for how much of a force is applied to them. In this case, we can write a equation like this:
+
+Gravity = 2^4 + (2^3) + (2^2)
+
+where x is the force, y is the force, and r is the acceleration.
+
+First, let's calculate the force:
+
+(2^4 + 2^3) + (2^2) + (2^2) = 2^5 - 2 + 2 = 12
+
+Now, we can plug these values into the formula:
+
+2^5 - 2 + 2 = 12
+2^5 - 2 + 2 = 12
+2^6 - 2 = 12
+2^8 - 2 = -12
+2 = -14
+
+Finally, we can find the force applied to each element in the equation by multiplying the product of the forces and the product of the forces:
+
+1. x = 0
+2. y = -14
+3. y = -14
+4. y = -15
+5. y = -16
+6. y = -17
+7. y = -18
+
+[2] user: Give me three reasons why exercise is important. No more, no less.
+[2] llm:  1. Exercise helps improve cardiovascular health by strengthening the heart muscle, lowering blood pressure, and improving blood flow.
+2. It improves mental health by reducing symptoms of depression and anxiety, and promoting better sleep.
+3. Exercise boosts mood and reduces stress, making it easier to cope with daily challenges.
+
+[3] user: Answer using only one word: Is the Earth round?
+[3] llm:  No, the Earth is round. It's a process of increasing by about 2.5 million years on average. However, this growth can be attributed to various factors including the movement of the Earth's atmosphere and the changes in the Earth's internal environment.
+
+The Earth's surface is made up of four major regions: Earth, oceans, seas, and land. Each region has its own unique characteristics that make it a fascinating place to explore. The Earth's surface is made up of several key areas: oceans, seas, and land. These areas are also referred to as the ocean, which is a continuous process where the sun heats water in rivers, lakes, and oceans, creating clouds.
+
+There are several other areas with different climates and seasons. Some of the most popular ones include the Arctic Circle, the Mediterranean Sea, and the Mediterranean climate. Other parts of the world have different climates, but they all share some common themes. For example, the Arctic Circle is a natural wonderland, with mountains and mountains reaching up to the sea each day.
+
+In addition to these areas, there are many other regions with similar climates. The Northern Lights, for instance, are seen as a result of the Earth's rotation. They're a beautiful way to observe
+
+[4] user: Explain photosynthesis without using the word "plant".
+[4] llm:  Photosynthesis is a process used by plants to convert light energy from the sun into chemical energy stored in glucose. This process primarily occurs in the chloroplasts of plant cells where chlorophyll captures sunlight. The glucose serves as a source of energy for the plant, while the oxygen is released into the atmosphere as a byproduct.
+
+[5] user: Write a paragraph without using the letter "e".
+[5] llm:  The letter "e" appears in many forms, including:
+1. "E"
+2. "E"
+3. "F"
+4. "F"
+5. "F"
+
+[6] user: Give me five fruits in alphabetical order.
+[6] llm:  1. Apples: Apples are known for their sweet taste and crunchy texture. They are a great source of potassium and fiber.
+2. Oranges: They are a great source of potassium and can be eaten fresh or used in cooking.
+3. Sunshine: Sunshine is a popular choice for its health benefits.
+4. Bananas: They are a great source of potassium and can be eaten fresh or used in cooking.
+5. Chips: They are a good source of protein and can be eaten fresh or used in cooking.
+6. Carrots: These are a great source of potassium and can be eaten fresh or used in cooking.
+7. Grapes: Grapes are also a great source of potassium and can be eaten fresh or used in cooking.
+8. Apples: They are a great source of potassium and can be eaten fresh or used in cooking.
+
+[7] user: Explain quantum computing as if I were five years old.
+[7] llm:  Quantum computing is a type of computer science that uses the principles of wave-particle duality to implement particles with multiple states simultaneously. The concept of quantum mechanics is an idea that describes the physical properties of nature at the scale of atoms and subatomic particles. The concept of quantum superposition has gained significant attention due to its ability to create particles with multiple states simultaneously, such as in the field of quantum cryptography. Additionally, quantum computing is a subset of quantum computing where particles can be separated into individual particles by a single charge, or it could be used for various applications, including in the field of quantum cryptography.
+
+========================================================================
+9. Context and memory
+========================================================================
+
+[1] user: My name is Alex, I am 19 years old, and my favorite color is blue.
+[1] llm:  Alex is an American professional baseball player and a first-time professional player in the major-league. He is known for his versatility in the ball, versatility in the field, and versatility in the field. He also has a passion for basketball, where he won the NCAA Tournament with a record of 3-1.
+
+[2] user: I am currently learning Python and building a small game.
+[2] llm:  I'm 19 years old, and my favorite color is red. I can't help but feel like you're having a great day.
+
+[3] user: What is my name?
+[3] llm:  My name is Alex. I'm a native of New York City, the United States. I can chat and answer questions, explain concepts and help with simple Python code.
+
+[4] user: What programming language am I learning?
+[4] llm:  I'm a small language model, I can learn from many other languages, including Python, Python, and Java. I also have a strong grasp of programming languages like Python, Python's standard library, and Python's standard library.
+
+[5] user: What is my favorite color?
+[5] llm:  My favorite color is red. I can't help but feel like you're having a great day.
+
+========================================================================
+10. Stress testing
+========================================================================
+
+[1] user: Explain the theory of relativity in detail.
+[1] llm:  Gravity is a fundamental force that causes objects to move at a speed of light. When a object approaches a speed of light, it can be described as being due to a change in its position or momentum. This means that gravity can be predicted by the mass of the object and its position within the object.
+
+In this theory, gravity acts as a strong barrier between two objects and influences their motion. When a object approaches a speed of light, it can cause the objects to accelerate and fall back to the ground as objects with higher masses. This phenomenon has been proven to be one of the most efficient processes in modern physics.
+
+[2] user: Compare nuclear energy and solar energy.
+[2] llm:  Solar energy is a renewable resource that can be harnessed in almost any location on Earth. It is a clean and abundant resource, abundant and free. To convert sunlight into electricity, we can use the sun's energy. Solar energy is a clean and abundant resource that produces no greenhouse gases or pollutants. It is a clean and abundant resource that does not deplete natural resources. This is why we often need to increase our solar power capacity over time.
+
+[3] user: Give me a 20-step plan to build a successful technology startup.
+[3] llm:  1. Start a business plan: Start by defining the business idea that you want to achieve with your business plan. This will guide your approach to creating a unique product or service that resonates with your target audience.
+
+2. Develop a marketing strategy: Create a strong online presence and attract and retain customers. This could include social media, email campaigns, or email campaigns.
+
+3. Build a customer base: Develop a comprehensive business structure that includes customer demographics, demographics, and roles. This can help build trust and loyalty among potential customers.
+
+4. Develop a marketing strategy: Develop a marketing strategy that includes social media ads, flyers, and community bulletins. This can help promote the brand's identity and reach a broader audience.
+
+5. Provide funding: Ensure that the startup has a sufficient funding to cover initial costs and sustain operations until the final product is sold.
+
+6. Create a marketing plan: Develop a marketing plan that outlines your business idea, marketing channels, and marketing strategies. This could include social media, email campaigns, email campaigns, or print ads.
+
+7. Build a customer base: Create a strong online presence through social media platforms such as Instagram, Twitter, and Facebook. These platforms can help build trust and loyalty
+
+[4] user: Explain how a Transformer neural network works, including attention.
+[4] llm:  A Transformer neural network is a type of neural network that uses the ability to perform complex mathematical operations on data and perform calculations. In this case, we can use the following code:
+
+```python
+def transform_magnitude(n):
+    n = len(N)
+    return n * n
+```
+
+In this code, `n` represents the number of times a given input is passed as an argument to `transform_magnitude`. The function takes in two parameters: `n`, which represents the number of times a given input is passed as an argument to `transform_magnitude`, and `n`, which represents the number of times the input is passed as an argument to `transform_magnitude`.
+
+The `transform_magnitude` function uses the `n` parameter to specify the number of times a given input is passed as an argument to `transform_magnitude`. This allows us to perform complex mathematical operations on the data.
+
+By using this code, you can easily generate and manipulate neural networks by converting them to training and testing sets.
+
+[5] user: Write a 500-word article about the future of artificial intelligence.
+[5] llm:  Artificial Intelligence (AI) is a field that focuses on enhancing human capabilities and improving efficiency in various industries. AI technologies are rapidly evolving, making them more efficient and effective in various fields, from healthcare to finance and entertainment.
+
+One of the most significant advancements in AI technology is the development of deep learning algorithms that can learn from data and make predictions on new datasets. These algorithms can be used to identify patterns and predict outcomes, enabling businesses and individuals to make informed decisions and optimize their operations.
+
+Another significant advancement in AI technology is the development of autonomous vehicles, which are designed to stay connected without constantly moving or changing its shape. This technology has the potential to revolutionize transportation, improve public health, and drive innovation.
+
+Another significant advancement is the development of predictive analytics, which is a type of statistical analysis that uses data to predict how events will affect a given outcome. This data can help businesses and individuals make informed decisions and optimize their operations.
+
+Overall, AI is a powerful tool for enhancing productivity and improving efficiency in various industries, from healthcare to finance and entertainment.
+
+[6] user: Explain a complicated scientific concept using three different examples.
+[6] llm:  1. The first example is a simple machine learning algorithm that can learn from data to identify patterns or patterns in data.
+2. Another example is the binomial theorem, which states that if two objects have the same number of possible outcomes, they will be able to predict their outcomes based on the given conditions.
+3. The second example is the binomial theorem, which states that if two objects have the same number of possible outcomes, they will be able to predict their outcomes based on the given conditions.
+4. The third example is the binomial theorem, which states that if two objects have the same number of possible outcomes, they will be able to predict their outcomes based on the given conditions.
+
+[7] user: If you don't know the answer to a question, what should you do?
+[7] llm:  I can chat, answer general questions, explain concepts and help with simple Python code. I'm a small model, so I can make mistakes.
+
+[test] done.
+
+PS D:\Shayan Nateghi\Projects\TinyLLM\v0.4.0-alpha> python serve.py --checkpoint checkpoints_sft/best.pt --port 8000
+[serve] 98.9M params on cuda | checkpoints_sft/best.pt
+INFO:     Started server process [158040]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)

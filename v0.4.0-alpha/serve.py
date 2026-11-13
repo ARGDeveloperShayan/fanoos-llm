@@ -11,8 +11,7 @@ from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
 from typing import List, Optional
 from fanoos import DEFAULT_SYSTEM_PROMPT, build_prompt, load_tokenizer
-from fanoos import FanoosConfig
-from fanoos import FanoosLLM
+from fanoos import FanoosConfig, FanoosLLM, clean_state_dict
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -31,9 +30,9 @@ class ChatRequest(BaseModel):
     model: str = "fanoos-ai"
     messages: List[Message]
     stream: bool = False
-    temperature: float = 0.8
+    temperature: float = 0.6
     top_k: int = 50
-    top_p: float = 0.95
+    top_p: float = 0.9
     max_tokens: int = 512
 
 @torch.no_grad()
@@ -131,7 +130,7 @@ def main():
     payload = torch.load(ckpt, map_location=device, weights_only=False)
     cfg = FanoosConfig(**payload["cfg"])
     model = FanoosLLM(cfg).to(device)
-    missing, unexpected = model.load_state_dict(payload["model"], strict=False)
+    missing, unexpected = model.load_state_dict(clean_state_dict(payload["model"]), strict=False)
     assert not unexpected and set(missing) <= {"lm_head.weight"}, (missing, unexpected)
     model.eval()
 

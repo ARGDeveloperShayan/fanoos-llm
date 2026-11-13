@@ -1,6 +1,6 @@
-# config/tinyllm.py
+# config/fanoosllm.py
 
-out_dir = 'tinyllm'
+out_dir = 'fanoosllm'
 eval_interval = 500
 eval_iters = 20
 log_interval = 10
@@ -8,7 +8,7 @@ log_interval = 10
 always_save_checkpoint = False
 wandb_log = False
 
-dataset = 'tinyllm'
+dataset = 'fanoosllm'
 gradient_accumulation_steps = 4
 batch_size = 16
 block_size = 256

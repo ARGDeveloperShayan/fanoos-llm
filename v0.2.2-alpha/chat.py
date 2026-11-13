@@ -83,7 +83,7 @@ def clear_screen():
 
 def show_help():
     print("\n" + "="*50)
-    print("TinyLLM Chat (BPE)")
+    print("FanoosLLM Chat (BPE)")
     print("Commands: /exit, /reload, /clear, /temp <value>")
     print("="*50 + "\n")
 

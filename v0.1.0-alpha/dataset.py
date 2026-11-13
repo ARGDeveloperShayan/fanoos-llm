@@ -1,5 +1,5 @@
 """
-PyTorch Dataset class for TinyLLM.
+PyTorch Dataset class for FanoosLLM.
 Handles data loading, tokenization, and formatting.
 """
 
@@ -11,9 +11,9 @@ from vocab import Vocabulary
 from data_generator import SyntheticDataGenerator
 
 
-class TinyLLMDataset(Dataset):
+class FanoosLLMDataset(Dataset):
     """
-    PyTorch Dataset for TinyLLM training data.
+    PyTorch Dataset for FanoosLLM training data.
     Generates or loads synthetic data and handles tokenization.
     """
     
@@ -113,7 +113,7 @@ if __name__ == '__main__':
     from vocab import Vocabulary
     
     vocab = Vocabulary()
-    dataset = TinyLLMDataset(vocab, num_examples=10)
+    dataset = FanoosLLMDataset(vocab, num_examples=10)
     
     print(f"Dataset size: {len(dataset)}")
     

@@ -1,0 +1,139 @@
+{
+  "checkpoint": "checkpoints_sft/best.pt",
+  "device": "cuda",
+  "params_M": 98.913024,
+  "config": {
+    "n_layer": 12,
+    "n_head": 8,
+    "n_kv_head": 2,
+    "n_embd": 768,
+    "ffn_dim": 2048,
+    "block_size": 512,
+    "vocab_size": 32000
+  },
+  "perplexity": {
+    "loss": 1.377331814145654,
+    "ppl": 3.964309987715247,
+    "blocks": 492
+  },
+  "generation_speed": {
+    "mean_tok_s": 142.6080156928185,
+    "std_tok_s": 2.4115486427880604,
+    "min_tok_s": 139.9663534012592,
+    "max_tok_s": 144.69159326405565,
+    "runs": 3,
+    "max_new_tokens": 128
+  },
+  "prefill_speed": {
+    "mean_tok_s": 38220.55451284472,
+    "prompt_len": 512
+  },
+  "qualitative": [
+    {
+      "category": "code",
+      "prompt": "Write a Python function that merges two sorted lists into one sorted list.",
+      "response": "To merge two sorted lists into one sorted list, we can use the `itertools.sorted` function in Python to merge two sorted lists simultaneously. The `itertools.sorted` function takes two sorted lists as parameters and returns a new list created by combining these two elements. Here's how you can reason about this problem:\n1. We need to create a new list from the original list without modifying the original list.\n2. To swap the two sorted lists, we can use the `itertools.sort()` method of the `itertools.sorted` function to sort the items in reverse order.\n3. To ensure that the elements"
+    },
+    {
+      "category": "code",
+      "prompt": "Implement a debounce decorator in Python.",
+      "response": "deflebounce(func):\n    def wrapper(*args, **kwargs):\n        return func(*args, **kwargs)\n\n    return wrapper\n\n@lebounce(func)\nprint(broadcast_func)\n```\n\nIn this code, the `leb reception` method takes an iterable object as input and returns a wrapper function with the same name as the original iterable object. The wrapper function checks if the argument `func` is not equal to the given argument. If it is, it calls `lebounce()` on the decorated iterable object. If it is not, it returns the wrapped function. \n\nThe `"
+    },
+    {
+      "category": "code",
+      "prompt": "Fix this bug: for i in range(len(items)): if items[i] == None: items.remove(items[i])",
+      "response": "To remove the bug from a list of items, we can use a list comprehension to iterate over the items and add them to a new list.\n\nHere's how you could do it:\n\n```python\ndef remove_ bug_from_list(items):\n    return [item for item in items if item[0] == 0]\n```\n\nThe `remove_ bug_from_list` function takes a list as input and iterates over its items using a for loop. For each item, it checks if it is less than or equal to 0 using the condition `item[0] < item[1"
+    },
+    {
+      "category": "code",
+      "prompt": "Write a Python class for a simple stack with push, pop, and peek methods.",
+      "response": "Here's an example implementation of the function in Python:\n\n```python\nclass Stack:\n    def __init__(self, value):\n        self.value = value\n\n    @staticmethod\n    def get(self, value):\n        if isinstance(value, (int, float)):\n            return self.value\n    @staticmethod\n    def set_copy(self, value):\n        self.target = value\n\nobj = Stack(0)\nprint(obj)  # Output: 30\n```\n\nThis implementation iterates over each node and creates a new object with a value of `value`. It then loops through each node"
+    },
+    {
+      "category": "code",
+      "prompt": "Explain what a Python generator is and give a short example.",
+      "response": "A Python generator is a generator that yields the results of a given task in a specific sequence. A generator is a method of a generator that takes another generator as its argument and returns a new yield value based on the original condition. In this case, the generator can be called with either a generator or another generator as its argument, or the `yield` argument if it's not in the original. In other words, if the generator has a generator that yields the same result as the original, it will return the result.\n\nHere's an example of how you can use the `yield` argument to generate the desired output:"
+    },
+    {
+      "category": "chat",
+      "prompt": "Explain the difference between TCP and UDP like I'm five.",
+      "response": "TCP is a block of code that performs many operations on a network. When a network connection is connected to the internet, it connects all components of the network together in a logical manner. This means that when the network is connected to the internet, it creates TCP-related network connections. \n\nUDP does not require any hardware or software support, as it is more expensive than connecting to other devices and services. However, for example, when a network connection is connected to the internet, it has to do some work, so it doesn't have any hardware or software support, as long as there's an external user. Therefore, the"
+    },
+    {
+      "category": "chat",
+      "prompt": "Give me a 3-step plan to learn machine learning.",
+      "response": "1. First, research the dataset thoroughly. This includes how the features of the dataset align with your specific requirements for classification.\n2. Next, research the underlying features and applications of the model. These can include classification, classification, and other relevant data.\n3. Finally, make predictions on your own or use metrics to track the success of your training.\n\nHere is a step-by-step plan:\n\n1. Identify the most relevant features of your dataset. This may involve adding more relevant features such as color accuracy, error-prone features, and additional metrics like accuracy.\n\n2. Identify the most"
+    },
+    {
+      "category": "chat",
+      "prompt": "What are the pros and cons of nuclear energy?",
+      "response": "The pros and cons of nuclear energy are numerous and multifaceted. The primary goal is to create a peaceful and sustainable environment that supports both environmental and economic goals.\n\nFor example, in the context of renewable energy, the use of fission devices in power plants can reduce the amount of neutrons required for an operation and decrease the number of protons needed to generate electricity. The fission devices, such as those used in photovoltaic cells or reactor cooling systems, can be controlled from the outward-reaching sources of energy, such as sunlight, wind, and water. The fuel efficiency and potential for the reactor are significantly reduced when the"
+    },
+    {
+      "category": "chat",
+      "prompt": "Tell me a short story about a robot that learns to paint.",
+      "response": "Once upon a time, in a small town nestled between rolling hills and dense forests, there lived a small group of robots called the B-C about an old red machine that had been working for years. They were the first to notice the strange behavior of the human machine on their own, and the machines they worked with were designed to learn from each other. The robots shared a lot of experiences with humans, and they could communicate using the human language.\n\nOne day, they discovered a machine that could be used to train a human called the human AI, which was a learning device. The human AI could learn to learn from different"
+    },
+    {
+      "category": "chat",
+      "prompt": "What is the capital of France and why is it famous?",
+      "response": "The capital of France is Paris. The city is known for its historical landmarks and cultural significance. Paris is also renowned for its romantic ambiance and modern architecture, making it a must-visit destination for art lovers and visitors alike."
+    }
+  ],
+  "factual": {
+    "accuracy": 0.2857142857142857,
+    "correct": 2,
+    "total": 7,
+    "rows": [
+      {
+        "q": "What is 2 + 2?",
+        "expected": "4",
+        "response": "to solve this problem, we need to determine the value of x, which represents the number of terms in the expression.\nwe know that 2 + 2 =",
+        "correct": false
+      },
+      {
+        "q": "What is the capital of Japan?",
+        "expected": "tokyo",
+        "response": "the capital of japan is tokyo. it is a city known for its historical landmarks and cultural significance.",
+        "correct": true
+      },
+      {
+        "q": "Who wrote Romeo and Juliet?",
+        "expected": "shakespeare",
+        "response": "cubus was born in the month of may, and he was born on august 15, 1889. he was a native of rome, and his father",
+        "correct": false
+      },
+      {
+        "q": "What color is the sky on a clear day?",
+        "expected": "blue",
+        "response": "the sky on a clear day is a beautiful shade of blue, with a warm, golden light that brightens even the darkest days. the sky is a canvas",
+        "correct": true
+      },
+      {
+        "q": "What is H2O commonly known as?",
+        "expected": "water",
+        "response": "h2o is a common name for various types of waste products, including paper, plastic, glass, and metal. it is also used in manufacturing, transportation",
+        "correct": false
+      },
+      {
+        "q": "How many days are in a week?",
+        "expected": [
+          "seven",
+          "7"
+        ],
+        "response": "to find out how many days are in a week, we need to multiply the number of days in a week by the number of days in a week.",
+        "correct": false
+      },
+      {
+        "q": "What planet is known as the Red Planet?",
+        "expected": "mars",
+        "response": "the red planet is a planet in the solar system that has a surface area of approximately 3.2 billion square kilometers. it is home to a diverse array of",
+        "correct": false
+      }
+    ]
+  },
+  "memory": {
+    "max_allocated_mb": 1511.3583984375,
+    "max_reserved_mb": 1622.0
+  }
+}

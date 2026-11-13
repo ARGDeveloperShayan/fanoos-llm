@@ -19,7 +19,7 @@ def load_model(ckpt_path):
     model.eval()
     return model, config
 
-meta_path = os.path.join('data', 'tinyllm', 'meta.pkl')
+meta_path = os.path.join('data', 'fanoosllm', 'meta.pkl')
 with open(meta_path, 'rb') as f:
     meta = pickle.load(f)
 stoi, itos = meta['stoi'], meta['itos']
@@ -36,12 +36,12 @@ def clear_screen():
 
 def show_help():
     print("\n" + "="*50)
-    print("nanoGPT Chat – TinyLLM")
+    print("nanoGPT Chat – FanoosLLM")
     print("Commands: /exit, /reload, /clear, /temp <value>")
     print("="*50 + "\n")
 
 # ---------- Load initial model ----------
-ckpt = os.path.join('tinyllm', 'ckpt.pt')
+ckpt = os.path.join('fanoosllm', 'ckpt.pt')
 model, config = load_model(ckpt)
 temperature = 0.8
 

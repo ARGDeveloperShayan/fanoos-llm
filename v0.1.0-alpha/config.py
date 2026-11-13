@@ -1,5 +1,5 @@
 """
-Configuration file for TinyLLM project.
+Configuration file for FanoosLLM project.
 Contains all hyperparameters and configuration settings.
 """
 
